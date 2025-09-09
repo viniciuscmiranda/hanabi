@@ -140,6 +140,7 @@ body {
   width: max-content;
 
   .options {
+    z-index: 2000;
     bottom: 0;
     padding-top: 1rem;
     transform: translateY(100%);
@@ -520,6 +521,14 @@ body {
     padding-top: 5rem;
     width: 100%;
     overflow-x: auto;
+  }
+
+  .hand .options {
+    top: 0;
+    bottom: unset;
+    transform: translateY(-100%);
+    padding-bottom: 1rem;
+    padding-top: 0;
   }
 
   .board-container {
