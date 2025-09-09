@@ -4,7 +4,6 @@ type CardProps = {
   card: (Me | OtherPlayer)["hand"][number];
   disabled: boolean;
   anchorTop?: boolean;
-  onClick?: () => void;
   options?: {
     label: string;
     onClick: () => void;
@@ -20,13 +19,7 @@ const valueMap: Record<CardType.VALUE, string> = {
   five: "5",
 };
 
-export const Card = ({
-  card,
-  disabled,
-  anchorTop,
-  onClick,
-  options,
-}: CardProps) => {
+export const Card = ({ card, disabled, anchorTop, options }: CardProps) => {
   return (
     <li>
       <button
@@ -34,7 +27,6 @@ export const Card = ({
         data-color={card.color}
         data-value={card.value}
         disabled={disabled}
-        onClick={onClick}
       >
         {card.value ? valueMap[card.value] : "?"}
       </button>
@@ -44,8 +36,8 @@ export const Card = ({
           className="options"
           data-anchor-top={anchorTop ? "true" : undefined}
         >
-          {options?.map((option) => (
-            <li key={option.label}>
+          {options?.map((option, index) => (
+            <li key={index}>
               <button onClick={option.onClick} disabled={option.disabled}>
                 {option.label}
               </button>

@@ -43,18 +43,14 @@ export const Board = ({ state }: BoardProps) => {
           </ul>
         </section>
 
-        <section className="discard">
+        <section className="discard" onClick={() => setShowDiscardModal(true)}>
           <section className="info">
             <span>🃏 {state.discardPile.length}</span>
           </section>
           {!state.discardPile.length && <i>Nada</i>}
           <ul>
             {Object.values(discardPile).length > 0 && (
-              <Card
-                card={state.discardPile.at(-1)!}
-                disabled={false}
-                onClick={() => setShowDiscardModal(true)}
-              />
+              <Card card={state.discardPile.at(-1)!} disabled={false} />
             )}
           </ul>
         </section>

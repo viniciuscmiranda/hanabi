@@ -18,8 +18,8 @@ export const Room = ({ state, onReady, onDisconnect }: RoomProps) => {
         <h1>🎆 花火</h1>
         <section>
           <ul>
-            {state.players.map((player) => (
-              <li key={player.name}>
+            {state.players.map((player, index) => (
+              <li key={index}>
                 <span>{player.ready ? "✅" : "❌"}</span>
                 <span>
                   {player.name}
