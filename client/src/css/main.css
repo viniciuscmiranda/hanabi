@@ -505,7 +505,8 @@ body {
     right: 1rem;
     padding: 0;
 
-    ul {
+    ul,
+    i {
       display: none;
     }
   }
