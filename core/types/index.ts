@@ -5,3 +5,4 @@ export * from "./game-state";
 export * from "./room-state";
 export * from "./card";
 export * from "./expansion";
+export * from "./log";

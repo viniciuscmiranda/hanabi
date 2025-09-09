@@ -1,16 +1,16 @@
 import { useMemo } from "react";
-import type { GameState, Card, Me, OtherPlayer } from "../../../core/types";
-
-const valueMap: Record<Card.VALUE, string> = {
-  one: "1",
-  two: "2",
-  three: "3",
-  four: "4",
-  five: "5",
-};
+import type { GameState } from "../../../core/types";
+import { Card } from "./card";
+import { Hand } from "./hand";
+import { Board } from "./board";
+import { Pause } from "./pause";
+import { GameOver } from "./game-over";
+import { DisconnectButton } from "./disconnect-button";
+import { Logs } from "./logs";
 
 type GameProps = {
   state: GameState;
+  onReset: () => void;
   onPlayCard: (cardIndex: number) => void;
   onDiscardCard: (cardIndex: number) => void;
   onGiveTip: (
@@ -22,145 +22,85 @@ type GameProps = {
 
 export const Game = ({
   state,
+  onReset,
   onPlayCard,
   onDiscardCard,
   onGiveTip,
 }: GameProps) => {
-  const [me, ...otherPlayers] = useMemo(() => {
-    type WithIndex<T> = T & { index: number };
-
+  const players = useMemo(() => {
     const players = state.players.map((p, index) => ({ ...p, index }));
 
     while (players.findIndex((player) => player.isMe) > 0) {
       players.push(players.shift()!);
     }
 
-    return [
-      players[0] as WithIndex<Me>,
-      ...(players.slice(1) as WithIndex<OtherPlayer>[]),
-    ];
+    return players;
   }, [state.players]);
 
-  const isMyTurn = state.currentPlayerIndex === me.index;
+  const isMyTurn =
+    players.find((player) => player.isMe)?.index === state.currentPlayerIndex;
 
   return (
     <main className="game">
+      <Logs logs={state.logs} />
+      <DisconnectButton onDisconnect={onReset} />
+
+      {state.isGamePaused && !state.isGameFinished && <Pause />}
+      {state.isGameFinished && <GameOver onReset={onReset} state={state} />}
+
       <section className="players">
         <ul>
-          {otherPlayers.map((player) => (
-            <li
+          {players.map((player) => (
+            <Hand
               key={player.index}
-              className="player"
-              data-current={
-                state.currentPlayerIndex === player.index ? "true" : undefined
-              }
+              isMe={player.isMe}
+              isCurrent={state.currentPlayerIndex === player.index}
+              name={`${player.name} (${player.index + 1})`}
             >
-              <h3>
-                {player.name} ({player.index + 1})
-              </h3>
-              <ul className="hand">
-                {player.hand.map((card, index) => (
-                  <li key={index}>
-                    <button
-                      className="card"
-                      data-color={card.color}
-                      data-value={card.value}
-                      disabled={!isMyTurn || state.tips <= 0}
-                    >
-                      {valueMap[card.value]}
-                    </button>
+              {player.hand.map((card, index) => {
+                const myHandOptions = [
+                  {
+                    label: "Jogar",
+                    onClick: () => onPlayCard(index),
+                  },
+                  {
+                    label: "Descartar",
+                    onClick: () => onDiscardCard(index),
+                  },
+                ];
 
-                    <ul className="options">
-                      <li>
-                        <button
-                          onClick={() =>
-                            onGiveTip(player.index, index, "color")
-                          }
-                        >
-                          Cor
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          onClick={() =>
-                            onGiveTip(player.index, index, "value")
-                          }
-                        >
-                          Número
-                        </button>
-                      </li>
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </li>
+                const otherHandOptions = [
+                  {
+                    label: "Cor",
+                    onClick: () => onGiveTip(player.index, index, "color"),
+                    disabled: card.isColorRevealed,
+                  },
+                  {
+                    label: "Número",
+                    onClick: () => onGiveTip(player.index, index, "value"),
+                    disabled: card.isValueRevealed,
+                  },
+                ];
+
+                return (
+                  <Card
+                    key={index}
+                    card={card}
+                    anchorTop={player.isMe}
+                    options={player.isMe ? myHandOptions : otherHandOptions}
+                    disabled={
+                      !state.isGameFinished &&
+                      (!isMyTurn || (!player.isMe && state.tips <= 0))
+                    }
+                  />
+                );
+              })}
+            </Hand>
           ))}
         </ul>
       </section>
 
-      <section className="board">
-        <section className="info">
-          <span>💡 {state.tips}</span>
-          <span>❤️ {state.lives}</span>
-          <span>🏆 {state.score}</span>
-          <span>🔄 {state.roundNumber}</span>
-          <span>🃏 {state.deckSize}</span>
-        </section>
-
-        <ul>
-          {!state.board.length && <i>Nada</i>}
-          {state.board.map((pile, index) => {
-            const topCard = pile[0];
-
-            return (
-              <li
-                key={index}
-                className="card"
-                data-color={topCard.color}
-                data-value={topCard.value}
-              >
-                {valueMap[topCard.value]}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      <section
-        className="me player"
-        data-current={
-          state.currentPlayerIndex === me.index ? "true" : undefined
-        }
-      >
-        <h3>
-          {me.name} ({me.index + 1})
-        </h3>
-        <ul className="hand">
-          {me.hand.map((card, index) => (
-            <li key={index}>
-              <button
-                className="card"
-                data-color={card.color}
-                data-value={card.value}
-                disabled={!isMyTurn}
-              >
-                {card.value ? valueMap[card.value] : "?"}
-              </button>
-
-              <ul className="options" data-anchor-top>
-                <li>
-                  <button onClick={() => onPlayCard(index)}>Jogar</button>
-                </li>
-                <li>
-                  <button onClick={() => onDiscardCard(index)}>
-                    Descartar
-                  </button>
-                </li>
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <Board state={state} />
     </main>
   );
 };

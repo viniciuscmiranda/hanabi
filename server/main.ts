@@ -16,17 +16,49 @@ import { generateName } from "./names";
 const wss = new WebSocketServer({ port: 8080 });
 
 wss.on("connection", (ws) => {
-  if (Global.clients.length >= Rules.MAX_PLAYERS || Global.game) {
-    ws.send(JSON.stringify({ error: "Max players reached!" }));
+  const connectedClients = Global.clients.filter((client) => client.ws);
+
+  if (connectedClients.length >= Rules.MAX_PLAYERS) {
+    Message.sendError(ws, "A sala está cheia.");
     ws.close();
     return;
   }
 
-  const player = new Player(generateName());
-  const clientIndex = Global.clients.length;
-  Global.clients.push({ ws, player });
+  const disconnectedClient = Global.clients.find((client) => !client.ws);
 
-  Message.sendRoomUpdate();
+  if (Global.game && !disconnectedClient) {
+    Message.sendError(ws, "O jogo já começou.");
+    ws.close();
+    return;
+  }
+
+  const player = (() => {
+    if (disconnectedClient && Global.game && !Global.game.isGameFinished) {
+      disconnectedClient.ws = ws;
+
+      const player = disconnectedClient.player;
+      const newName = generateName();
+
+      Global.game.log(
+        `👋 ${newName} entrou no jogo no lugar de ${player.name}.`
+      );
+
+      player.isConnected = true;
+      player.name = newName;
+      Message.sendGameUpdate();
+
+      return player;
+    } else {
+      const player = new Player(generateName());
+
+      Global.clients.push({ ws, player });
+      Message.sendRoomUpdate();
+
+      return player;
+    }
+  })();
+
+  console.log(`${player.name} connected`);
 
   ws.on("message", (raw) => {
     const data = (JSON.parse(raw.toString()) || {}) as PlayerEvent;
@@ -86,22 +118,42 @@ wss.on("connection", (ws) => {
       Global.clients.forEach((client) => {
         client.player.isReady = false;
       });
-
-      Message.sendRoomUpdate();
     }
   });
 
-  ws.on("close", () => {
-    Global.clients.splice(clientIndex, 1);
+  Message.sendRoomUpdate();
 
+  ws.on("close", () => {
+    console.log(`${player.name} disconnected`);
+
+    if (Global.game) {
+      const connectedClients = Global.clients.filter((client) => client.ws);
+
+      if (connectedClients.length > 1) {
+        Global.clients = Global.clients.map((client) => {
+          if (client.player === player) client.ws = null;
+          return client;
+        });
+
+        player.isConnected = false;
+
+        Global.game.log(`🚪 ${player.name} saiu do jogo.`);
+        Message.sendGameUpdate();
+        Message.sendRoomUpdate();
+      } else {
+        Global.game = null;
+        Global.clients = [];
+      }
+
+      return;
+    }
+
+    Global.clients = Global.clients.filter(
+      (client) => client.player !== player
+    );
     Global.clients.forEach((client) => {
       client.player.isReady = false;
     });
-
-    if (Global.game) {
-      Global.game = null;
-      Message.sendGameStop();
-    }
 
     Message.sendRoomUpdate();
   });

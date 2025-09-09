@@ -6,4 +6,5 @@ export namespace Event {
   export type GAME_STOP = "GAME_STOP";
   export type GAME_UPDATE = "GAME_UPDATE";
   export type ROOM_UPDATE = "ROOM_UPDATE";
+  export type ERROR = "ERROR";
 }

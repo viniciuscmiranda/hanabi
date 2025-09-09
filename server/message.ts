@@ -1,20 +1,14 @@
+import type { WebSocket } from "ws";
+
 import { Player } from "./game/player";
 import { Card } from "./game/card";
 import { Global } from "./global";
 import type { GameEvent } from "../core/types";
 
 function send(event: (player: Player) => GameEvent) {
-  let logged = false;
-
   Global.clients.forEach((client) => {
     const data = event(client.player);
-
-    if (!logged) {
-      console.log(`send ${data.event}`);
-      logged = true;
-    }
-
-    client.ws.send(JSON.stringify(event(client.player)));
+    client.ws?.send(JSON.stringify(data));
   });
 }
 
@@ -49,8 +43,10 @@ export const Message = {
           roundNumber: Global.game.roundNumber,
           currentPlayerIndex: Global.game.currentPlayerIndex,
           isGameFinished: Global.game.isGameFinished,
+          isGamePaused: Global.game.isGamePaused,
           discardPile: Global.game.discardPile.cards,
           board: Global.game.board.getPiles(),
+          logs: Global.game.logs,
           players: Global.clients.map((c) => {
             const isMe = c.player === player;
 
@@ -75,5 +71,9 @@ export const Message = {
         },
       };
     });
+  },
+
+  sendError(ws: WebSocket, error: string) {
+    ws.send(JSON.stringify({ event: "ERROR", payload: { error } }));
   },
 };
