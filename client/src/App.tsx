@@ -44,6 +44,7 @@ export function App() {
     return (
       <Setup
         error="Desconectado"
+        initialValue={url}
         onConnect={(url) => {
           setUrl(url);
           connect();
