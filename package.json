@@ -1,0 +1,11 @@
+{
+  "name": "hanabi",
+  "scripts": {
+    "server": "npm run start --workspace server",
+    "client": "npm run start --workspace client"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ]
+}

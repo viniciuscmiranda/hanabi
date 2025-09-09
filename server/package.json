@@ -1,0 +1,17 @@
+{
+  "name": "hanabi-server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx watch main.ts"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.20.5",
+    "typescript": "~5.8.3"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
