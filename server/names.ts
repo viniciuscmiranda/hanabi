@@ -62,15 +62,15 @@ const NEUTRAL_ADJECTIVES = [
   "Cientista",
   "Monarquista",
   "Futurista",
-  "Flamenguista",
   "Carioca",
   "Paulista",
   "Taxista",
-  "Sonista",
-  "Nintendista",
-  "Caixista",
   "Petista",
   "Jovem",
+  "de Schrödinger",
+  "do BTS",
+  "da Twitch",
+  "Youtuber",
 ];
 
 const MALE_ADJECTIVES = [
@@ -103,6 +103,9 @@ const MALE_ADJECTIVES = [
   "Piloto",
   "Vascaino",
   "Místico",
+  "Quântico",
+  "Tulio",
+  "Twitteiro",
 ];
 
 const FEMALE_ADJECTIVES = [
@@ -132,6 +135,8 @@ const FEMALE_ADJECTIVES = [
   "Motoqueira",
   "Pilota",
   "Mística",
+  "Quântica",
+  "Twitteira",
 ];
 
 function random<T>(array: T[]) {
