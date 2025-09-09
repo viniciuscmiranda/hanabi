@@ -1,4 +1,5 @@
 import type { Card } from "./card";
+import type { Log } from "./log";
 
 export type OtherPlayer = {
   name: string;
@@ -23,6 +24,8 @@ export type GameState = {
   roundNumber: number;
   currentPlayerIndex: number;
   isGameFinished: boolean;
+  isGamePaused: boolean;
+  logs: Log[];
   discardPile: Card[];
   deckSize: number;
   board: Card[][];

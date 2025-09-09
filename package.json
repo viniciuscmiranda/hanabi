@@ -1,8 +1,12 @@
 {
   "name": "hanabi",
+  "version": "0.0.1",
+  "homepage": "https://viniciuscmiranda.github.io/hanabi",
   "scripts": {
     "server": "npm run start --workspace server",
-    "client": "npm run start --workspace client"
+    "client": "npm run start --workspace client",
+    "build:client": "npm run build --workspace client",
+    "deploy:client": "npm run build:client && npx -y gh-pages -d client/dist"
   },
   "workspaces": [
     "client",

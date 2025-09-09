@@ -17,4 +17,13 @@ type GameStopEvent = {
   payload?: never;
 };
 
-export type GameEvent = RoomUpdateEvent | GameUpdateEvent | GameStopEvent;
+type ErrorEvent = {
+  event: Event.ERROR;
+  payload: { error: string };
+};
+
+export type GameEvent =
+  | RoomUpdateEvent
+  | GameUpdateEvent
+  | GameStopEvent
+  | ErrorEvent;

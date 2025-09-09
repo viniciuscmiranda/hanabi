@@ -3,6 +3,7 @@ import { Card } from "./card";
 export class Player {
   public hand: Card[] = [];
   public isReady = false;
+  public isConnected = true;
 
   constructor(public name: string) {}
 
