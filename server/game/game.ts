@@ -196,7 +196,6 @@ export class Game {
     const deckEnded = this.deck.amountOfCards <= 0;
     const lastPlayerWhoDrewPlayed =
       this.lastPlayerWhoDrewIndex === this.currentPlayerIndex;
-
     this.isGameFinished = livesEnded || (deckEnded && lastPlayerWhoDrewPlayed);
 
     if (this.isGameFinished) {

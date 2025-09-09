@@ -88,6 +88,9 @@ export const Game = ({
                     card={card}
                     anchorTop={player.isMe}
                     options={player.isMe ? myHandOptions : otherHandOptions}
+                    showTips={!player.isMe}
+                    isValueRevealed={card.isValueRevealed}
+                    isColorRevealed={card.isColorRevealed}
                     disabled={
                       !state.isGameFinished &&
                       (!isMyTurn || (!player.isMe && state.tips <= 0))

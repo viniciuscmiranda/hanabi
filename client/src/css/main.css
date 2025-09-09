@@ -265,6 +265,15 @@ body {
   color: var(--color);
   border: 0.2rem solid var(--color);
 
+  .tip {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+    top: 0.25rem;
+    right: 0.25rem;
+    position: absolute;
+  }
+
   &:enabled:hover {
     cursor: pointer;
     opacity: 0.5;
@@ -373,7 +382,7 @@ body {
 }
 
 .room footer button,
-.game-over button,
+.game-over > button,
 .setup button {
   width: 10rem;
   margin-top: 1rem;

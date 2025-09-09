@@ -6,6 +6,9 @@ import { Loading } from "./components/loading";
 import { Game } from "./components/game";
 import { Setup } from "./components/setup";
 
+// TODO: fix zoom
+// TODO: reveal all cards at the end
+// TODO: condition all piles are finished
 export function App() {
   const [url, setUrl] = useState("");
 
