@@ -1,7 +1,12 @@
 import { Card } from "./card";
 import type { Expansion } from "../../core/types";
 
-const Decks: Record<Card.COLOR, { value: Card.VALUE; color: Card.COLOR }[]> = {
+type CardProps = {
+  value: Card.VALUE;
+  color: Card.COLOR;
+};
+
+const Decks: Record<Card.COLOR, CardProps[]> = {
   red: [
     { value: "one", color: "red" },
     { value: "one", color: "red" },
@@ -88,29 +93,29 @@ const Decks: Record<Card.COLOR, { value: Card.VALUE; color: Card.COLOR }[]> = {
 };
 
 export class DeckBuilder {
-  static build(...expansions: Expansion[]) {
+  static build(expansions: Expansion[]) {
     const cards: Card[] = [];
 
     cards.push(
-      ...Decks.red.map((card) => new Card(card.value, card.color)),
-      ...Decks.green.map((card) => new Card(card.value, card.color)),
-      ...Decks.blue.map((card) => new Card(card.value, card.color)),
-      ...Decks.yellow.map((card) => new Card(card.value, card.color)),
-      ...Decks.white.map((card) => new Card(card.value, card.color))
+      ...Decks.red.map(this.buildCard),
+      ...Decks.green.map(this.buildCard),
+      ...Decks.blue.map(this.buildCard),
+      ...Decks.yellow.map(this.buildCard),
+      ...Decks.white.map(this.buildCard)
     );
 
     if (expansions.includes("avalanche_of_colors")) {
-      cards.push(
-        ...Decks.multicolor.map((card) => new Card(card.value, card.color))
-      );
+      cards.push(...Decks.multicolor.map(this.buildCard));
     }
 
     if (expansions.includes("black_powder")) {
-      cards.push(
-        ...Decks.colorless.map((card) => new Card(card.value, card.color))
-      );
+      cards.push(...Decks.colorless.map(this.buildCard));
     }
 
     return cards;
+  }
+
+  private static buildCard(card: CardProps) {
+    return new Card(card.value, card.color);
   }
 }

@@ -1,4 +1,5 @@
 import type { Card } from "./card";
+import type { Expansion } from "./expansion";
 import type { Log } from "./log";
 
 export type OtherPlayer = {
@@ -25,6 +26,7 @@ export type GameState = {
   currentPlayerIndex: number;
   isGameFinished: boolean;
   isGamePaused: boolean;
+  expansions: Expansion[];
   logs: Log[];
   discardPile: Card[];
   deckSize: number;

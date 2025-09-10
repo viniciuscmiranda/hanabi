@@ -73,7 +73,8 @@ export const Game = ({
                   {
                     label: "Cor",
                     onClick: () => onGiveTip(player.index, index, "color"),
-                    disabled: card.isColorRevealed,
+                    disabled:
+                      card.isColorRevealed || card.color === "colorless",
                   },
                   {
                     label: "Número",

@@ -1,8 +1,20 @@
+import type { Expansion } from "../../core/types";
+
 import { Rules } from "../rules";
 import { Card } from "./card";
 
+const mapValueToPoints: Record<Card.VALUE, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+};
+
 export class Board {
   private piles: Map<Card.COLOR, Card[]> = new Map();
+
+  constructor(public expansions: Expansion[]) {}
 
   public add(card: Card) {
     const pile = this.piles.get(card.color) || [];
@@ -20,7 +32,7 @@ export class Board {
     return true;
   }
 
-  public getPileCards(color: Card.COLOR) {
+  public getPileByColor(color: Card.COLOR) {
     return this.piles.get(color) || [];
   }
 
@@ -30,14 +42,44 @@ export class Board {
 
   public isPileFinished(color: Card.COLOR) {
     return (
-      this.getPileCards(color).length ===
+      this.getPileByColor(color).length ===
       Rules.ORDERED_CARD_VALUES_BY_COLOR[color].length
     );
   }
 
+  public isAllPilesFinished() {
+    const colors: Card.COLOR[] = ["red", "green", "blue", "yellow", "white"];
+
+    if (this.expansions.includes("avalanche_of_colors")) {
+      colors.push("multicolor");
+    }
+
+    if (this.expansions.includes("black_powder")) {
+      colors.push("colorless");
+    }
+
+    return colors.every((color) => this.isPileFinished(color));
+  }
+
   public get score() {
-    return this.getPiles().reduce((acc, pile) => {
-      return acc + pile.length;
+    const score = this.getPiles().reduce((acc, pile) => {
+      const top = pile[0];
+      if (top.color === "colorless") return acc;
+
+      const points = mapValueToPoints[top.value];
+
+      return acc + points;
     }, 0);
+
+    if (this.expansions.includes("black_powder")) {
+      const colorlessPile = this.getPileByColor("colorless");
+      const missingCards =
+        Rules.ORDERED_CARD_VALUES_BY_COLOR["colorless"].length -
+        colorlessPile.length;
+
+      return score - missingCards;
+    }
+
+    return score;
   }
 }
