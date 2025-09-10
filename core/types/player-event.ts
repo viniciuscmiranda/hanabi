@@ -29,8 +29,14 @@ type PlayerGiveTipEvent = {
   };
 };
 
+type PlayerRenameEvent = {
+  event: Event.PLAYER_RENAME;
+  payload?: never;
+};
+
 export type PlayerEvent =
   | PlayerReadyEvent
   | PlayerPlayEvent
   | PlayerDiscardEvent
-  | PlayerGiveTipEvent;
+  | PlayerGiveTipEvent
+  | PlayerRenameEvent;

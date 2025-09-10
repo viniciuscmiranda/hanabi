@@ -153,7 +153,7 @@ export function generateName() {
     ...(MALE_ANIMALS.includes(animal) ? MALE_ADJECTIVES : FEMALE_ADJECTIVES),
   ]);
 
-  const newName = `${adjective} ${animal}`;
+  const newName = `${animal} ${adjective}`;
 
   const playerNamesList = Global.clients.map((client) => client.player.name);
 

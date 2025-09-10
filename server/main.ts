@@ -111,6 +111,12 @@ wss.on("connection", (ws) => {
           Message.sendGameUpdate();
         }
         break;
+
+      case "PLAYER_RENAME":
+        if (Global.game) return;
+        player.selfRename();
+        Message.sendRoomUpdate();
+        break;
     }
 
     if (Global.game && Global.game.isGameFinished) {
