@@ -56,10 +56,6 @@ export class Game {
     }
   }
 
-  public renamePlayer(player: Player) {
-    player.selfRename();
-  }
-
   start() {
     this.deck.shuffle();
 

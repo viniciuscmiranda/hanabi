@@ -60,6 +60,8 @@ wss.on("connection", (ws) => {
 
   console.log(`${player.name} connected`);
 
+  Message.sendRoomUpdate();
+
   ws.on("message", (raw) => {
     const data = (JSON.parse(raw.toString()) || {}) as PlayerEvent;
     const { event, payload } = data;
@@ -126,8 +128,6 @@ wss.on("connection", (ws) => {
       });
     }
   });
-
-  Message.sendRoomUpdate();
 
   ws.on("close", () => {
     console.log(`${player.name} disconnected`);
