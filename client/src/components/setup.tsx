@@ -2,19 +2,19 @@ import { useState } from "react";
 
 type SetupProps = {
   error?: string;
-  initialValue?: string;
+  initial?: string;
   onConnect: (url: string) => void;
 };
 
-export const Setup = ({ error, onConnect, initialValue }: SetupProps) => {
-  const [value, setValue] = useState(initialValue || "ws://localhost:8080");
+export const Setup = ({ error, onConnect, initial }: SetupProps) => {
+  const [value, setValue] = useState(initial);
 
   return (
     <form
       className="setup"
       onSubmit={(e) => {
         e.preventDefault();
-        onConnect(value);
+        if (value) onConnect(value);
       }}
     >
       <h1>🎆 花火</h1>

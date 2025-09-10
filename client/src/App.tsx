@@ -1,5 +1,4 @@
 import { useGame } from "./hooks/use-game";
-import { useState } from "react";
 
 import { Room } from "./components/room";
 import { Loading } from "./components/loading";
@@ -7,38 +6,40 @@ import { Game } from "./components/game";
 import { Setup } from "./components/setup";
 
 export function App() {
-  const [url, setUrl] = useState("");
-
   const {
     makePlayerReady,
+    renamePlayer,
     playCard,
     discardCard,
-    renamePlayer,
     giveTip,
     disconnect,
     connect,
+    reset,
     room,
     game,
     isConnected,
     isConnecting,
     error,
-  } = useGame(url);
-
-  if (error || !isConnected) {
-    return (
-      <Setup
-        error={error}
-        initialValue={url}
-        onConnect={(url) => {
-          setUrl(url);
-          connect();
-        }}
-      />
-    );
-  }
+  } = useGame();
 
   if (isConnecting) {
     return <Loading message="Conectando-se ao servidor" />;
+  }
+
+  if (!isConnected) {
+    const url = sessionStorage.getItem("url") || "ws://localhost:8080";
+    const setUrl = (url: string) => sessionStorage.setItem("url", url);
+
+    return (
+      <Setup
+        error={error}
+        initial={url}
+        onConnect={(url) => {
+          setUrl(url);
+          connect(url);
+        }}
+      />
+    );
   }
 
   if (!room) {
@@ -50,8 +51,8 @@ export function App() {
       <Room
         state={room}
         onReady={makePlayerReady}
-        onDisconnect={disconnect}
         onRename={renamePlayer}
+        onDisconnect={disconnect}
       />
     );
   }
@@ -62,7 +63,8 @@ export function App() {
       onPlayCard={playCard}
       onDiscardCard={discardCard}
       onGiveTip={giveTip}
-      onReset={disconnect}
+      onReset={reset}
+      onDisconnect={disconnect}
     />
   );
 }

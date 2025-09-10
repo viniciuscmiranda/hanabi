@@ -6,33 +6,7 @@ import type { Board } from "./board";
 import type { DiscardPile } from "./discard-pile";
 import { Rules } from "../rules";
 import { Card } from "./card";
-
-const readableValues = {
-  one: "1️⃣",
-  two: "2️⃣",
-  three: "3️⃣",
-  four: "4️⃣",
-  five: "5️⃣",
-};
-
-const readableColors = {
-  red: "🔴",
-  green: "🟢",
-  blue: "🔵",
-  yellow: "🟡",
-  white: "⚪",
-  multicolor: "🌈",
-  colorless: "⚫",
-};
-
-function getCardName(card: Card) {
-  return `"${readableValues[card.value]}${readableColors[card.color]}"`;
-}
-
-function getInfoName(info: Card.INFO, card: Card) {
-  if (info === "value") return `"${readableValues[card.value]}"`;
-  else if (info === "color") return `"${readableColors[card.color]}"`;
-}
+import { Readable } from "../utils/readable";
 
 export class Game {
   public turnNumber = 0;
@@ -56,7 +30,7 @@ export class Game {
     }
   }
 
-  start() {
+  public start() {
     this.deck.shuffle();
 
     const totalCards = Rules.CARDS_BY_AMOUNT_OF_PLAYERS[this.players.length];
@@ -68,7 +42,9 @@ export class Game {
       }
     });
 
-    this.log(`🔄 Turno de ${this.players[this.currentPlayerIndex].name}`);
+    this.log(
+      `🔄 Turno de ${this.currentPlayer.name} (Rodada ${this.roundNumber}).`
+    );
   }
 
   public giveTip(
@@ -109,7 +85,7 @@ export class Game {
     });
 
     this.log(
-      `💡 ${player.name} deu a dica ${getInfoName(info, selectedCard)} em ${
+      `💡 ${player.name} deu a dica ${Readable.info(info, selectedCard)} em ${
         cardsToReveal.length
       } cartas para ${selectedPlayer.name} (Restam ${this.tips}/${
         Rules.MAX_TIPS
@@ -126,13 +102,12 @@ export class Game {
     const playedCard = player.getCardByIndex(cardIndex);
     if (!playedCard) return;
 
-    const cardName = getCardName(playedCard);
-    this.log(`🃏 ${player.name} jogou ${cardName}.`);
+    this.log(`🃏 ${player.name} jogou ${Readable.card(playedCard)}.`);
 
     player.removeCard(playedCard);
-    const wasAddedToBoard = this.board.add(playedCard);
+    const wasAddedToTheBoard = this.board.add(playedCard);
 
-    if (!wasAddedToBoard) {
+    if (!wasAddedToTheBoard) {
       this.discardPile.add(playedCard);
       this.lives--;
       this.log(
@@ -159,7 +134,7 @@ export class Game {
     const discardedCard = player.getCardByIndex(cardIndex);
     if (!discardedCard) return;
 
-    this.log(`🃏 ${player.name} descartou ${getCardName(discardedCard)}.`);
+    this.log(`🃏 ${player.name} descartou ${Readable.card(discardedCard)}.`);
 
     player.removeCard(discardedCard);
     this.discardPile.add(discardedCard);
@@ -174,6 +149,22 @@ export class Game {
     if (this.checkGameFinished()) return;
     this.drawCard(player);
     this.endTurn();
+  }
+
+  public disconnectPlayer(player: Player) {
+    player.isConnected = false;
+    this.log(`🚪 ${player.name} saiu do jogo.`);
+  }
+
+  public replacePlayer(oldPlayer: Player, newPlayer: Player) {
+    newPlayer.hand = oldPlayer.hand;
+    newPlayer.isReady = true;
+    newPlayer.isConnected = true;
+    this.players.splice(this.players.indexOf(oldPlayer), 1, newPlayer);
+
+    this.log(
+      `👋 ${newPlayer.name} entrou no jogo no lugar de ${oldPlayer.name}.`
+    );
   }
 
   private drawCard(player: Player) {
@@ -220,15 +211,25 @@ export class Game {
 
   private endTurn() {
     this.turnNumber++;
-    this.log(`🔄 Turno de ${this.players[this.currentPlayerIndex].name}.`);
+    this.log(
+      `🔄 Turno de ${this.currentPlayer.name} (Rodada ${this.roundNumber}).`
+    );
   }
 
   private isPlayerTurn(player: Player) {
     return this.currentPlayerIndex === this.players.indexOf(player);
   }
 
+  private log(message: string) {
+    this.logs.unshift({ timestamp: new Date().toISOString(), message });
+  }
+
   public get currentPlayerIndex() {
     return this.turnNumber % this.players.length;
+  }
+
+  public get currentPlayer() {
+    return this.players[this.currentPlayerIndex];
   }
 
   public get roundNumber() {
@@ -237,9 +238,5 @@ export class Game {
 
   public get isGamePaused() {
     return this.players.some((player) => !player.isConnected);
-  }
-
-  public log(message: string) {
-    this.logs.unshift({ timestamp: new Date().toISOString(), message });
   }
 }

@@ -1,15 +1,18 @@
-import { generateName } from "../names";
+import { generatePlayerName } from "../utils/generate-player-name";
 import { Card } from "./card";
 
 export class Player {
   public hand: Card[] = [];
   public isReady = false;
   public isConnected = true;
+  public name: string;
 
-  constructor(public name: string) {}
+  constructor() {
+    this.rename();
+  }
 
-  public selfRename() {
-    this.name = generateName();
+  public rename() {
+    this.name = generatePlayerName();
   }
 
   public addCard(card: Card) {
@@ -23,5 +26,9 @@ export class Player {
 
   public getCardByIndex(cardIndex: number) {
     return this.hand.at(cardIndex);
+  }
+
+  public discardHand() {
+    this.hand = [];
   }
 }

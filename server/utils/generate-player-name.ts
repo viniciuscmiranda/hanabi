@@ -1,4 +1,4 @@
-import { Global } from "./global";
+import { Global } from "../global";
 
 const MALE_ANIMALS = [
   "Rato",
@@ -46,7 +46,6 @@ const NEUTRAL_ADJECTIVES = [
   "Vidente",
   "Banguela",
   "Cegueta",
-  "Baitola",
   "Nerdola",
   "Carente",
   "de iPhone",
@@ -103,10 +102,10 @@ const MALE_ADJECTIVES = [
   "Armado",
   "Motoqueiro",
   "Piloto",
-  "Vascaino",
+  "Vascaíno",
   "Místico",
   "Quântico",
-  "Tulio",
+  "Túlio",
   "Twitteiro",
 ];
 
@@ -145,7 +144,7 @@ function random<T>(array: T[]) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-export function generateName() {
+export function generatePlayerName() {
   const animal = random([...MALE_ANIMALS, ...FEMALE_ANIMALS]);
 
   const adjective = random([
@@ -153,13 +152,13 @@ export function generateName() {
     ...(MALE_ANIMALS.includes(animal) ? MALE_ADJECTIVES : FEMALE_ADJECTIVES),
   ]);
 
-  const newName = `${animal} ${adjective}`;
+  const name = `${animal} ${adjective}`;
 
-  const playerNamesList = Global.clients.map((client) => client.player.name);
+  const playerNames = Global.clients.map((client) => client.player.name);
 
-  if (playerNamesList.includes(newName)) {
-    return generateName();
+  if (playerNames.includes(name)) {
+    return generatePlayerName();
   }
 
-  return newName;
+  return name;
 }

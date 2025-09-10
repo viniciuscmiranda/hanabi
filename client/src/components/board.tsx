@@ -27,11 +27,11 @@ export const Board = ({ state }: BoardProps) => {
       <section className="board-container">
         <section className="board">
           <section className="info">
-            <span>💡 {state.tips}</span>
-            <span>❤️ {state.lives}</span>
-            <span>🏆 {state.score}</span>
-            <span>🔄 {state.roundNumber}</span>
-            <span>🃏 {state.deckSize}</span>
+            <span title="Dicas">💡 {state.tips}</span>
+            <span title="Vidas">❤️ {state.lives}</span>
+            <span title="Pontuação">🏆 {state.score}</span>
+            <span title="Rodada">🔄 {state.roundNumber}</span>
+            <span title="Baralho">🃏 {state.deckSize}</span>
           </section>
 
           {!state.board.length && <i>Nada</i>}
@@ -45,7 +45,7 @@ export const Board = ({ state }: BoardProps) => {
 
         <section className="discard" onClick={() => setShowDiscardModal(true)}>
           <section className="info">
-            <span>🃏 {state.discardPile.length}</span>
+            <span title="Descarte">🃏 {state.discardPile.length}</span>
           </section>
           {!state.discardPile.length && <i>Nada</i>}
           <ul>

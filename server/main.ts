@@ -10,8 +10,7 @@ import { Rules } from "./rules";
 import type { PlayerEvent } from "../core/types";
 
 import { Global } from "./global";
-import { Message } from "./message";
-import { generateName } from "./names";
+import { Message } from "./utils/message";
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -32,34 +31,20 @@ wss.on("connection", (ws) => {
     return;
   }
 
-  const player = (() => {
-    if (disconnectedClient && Global.game && !Global.game.isGameFinished) {
-      disconnectedClient.ws = ws;
+  const player = new Player();
 
-      const player = disconnectedClient.player;
-      const newName = generateName();
+  if (disconnectedClient && Global.game && !Global.game.isGameFinished) {
+    Global.game.replacePlayer(disconnectedClient.player, player);
 
-      Global.game.log(
-        `👋 ${newName} entrou no jogo no lugar de ${player.name}.`
-      );
+    disconnectedClient.ws = ws;
+    disconnectedClient.player = player;
 
-      player.isConnected = true;
-      player.name = newName;
-      Message.sendGameUpdate();
-
-      return player;
-    } else {
-      const player = new Player(generateName());
-
-      Global.clients.push({ ws, player });
-      Message.sendRoomUpdate();
-
-      return player;
-    }
-  })();
+    Message.sendGameUpdate();
+  } else {
+    Global.clients.push({ ws, player });
+  }
 
   console.log(`${player.name} connected`);
-
   Message.sendRoomUpdate();
 
   ws.on("message", (raw) => {
@@ -113,10 +98,9 @@ wss.on("connection", (ws) => {
           Message.sendGameUpdate();
         }
         break;
-
       case "PLAYER_RENAME":
         if (Global.game) return;
-        player.selfRename();
+        player.rename();
         Message.sendRoomUpdate();
         break;
     }
@@ -125,7 +109,10 @@ wss.on("connection", (ws) => {
       Global.game = null;
       Global.clients.forEach((client) => {
         client.player.isReady = false;
+        client.player.discardHand();
       });
+
+      Message.sendRoomUpdate();
     }
   });
 
@@ -134,16 +121,15 @@ wss.on("connection", (ws) => {
 
     if (Global.game) {
       const connectedClients = Global.clients.filter((client) => client.ws);
+      const isLastClient = connectedClients.length === 1;
 
-      if (connectedClients.length > 1) {
+      if (!isLastClient) {
+        Global.game.disconnectPlayer(player);
         Global.clients = Global.clients.map((client) => {
           if (client.player === player) client.ws = null;
           return client;
         });
 
-        player.isConnected = false;
-
-        Global.game.log(`🚪 ${player.name} saiu do jogo.`);
         Message.sendGameUpdate();
         Message.sendRoomUpdate();
       } else {
@@ -157,6 +143,7 @@ wss.on("connection", (ws) => {
     Global.clients = Global.clients.filter(
       (client) => client.player !== player
     );
+
     Global.clients.forEach((client) => {
       client.player.isReady = false;
     });

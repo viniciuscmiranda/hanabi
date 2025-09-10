@@ -11,6 +11,7 @@ import { Logs } from "./logs";
 type GameProps = {
   state: GameState;
   onReset: () => void;
+  onDisconnect: () => void;
   onPlayCard: (cardIndex: number) => void;
   onDiscardCard: (cardIndex: number) => void;
   onGiveTip: (
@@ -23,6 +24,7 @@ type GameProps = {
 export const Game = ({
   state,
   onReset,
+  onDisconnect,
   onPlayCard,
   onDiscardCard,
   onGiveTip,
@@ -43,7 +45,7 @@ export const Game = ({
   return (
     <main className="game">
       <Logs logs={state.logs} />
-      <DisconnectButton onDisconnect={onReset} />
+      <DisconnectButton onDisconnect={onDisconnect} />
 
       {state.isGamePaused && !state.isGameFinished && <Pause />}
       {state.isGameFinished && <GameOver onReset={onReset} state={state} />}
@@ -89,7 +91,7 @@ export const Game = ({
                     card={card}
                     anchorTop={player.isMe}
                     options={player.isMe ? myHandOptions : otherHandOptions}
-                    showTips={!player.isMe}
+                    showTips={!player.isMe && !state.isGameFinished}
                     isValueRevealed={card.isValueRevealed}
                     isColorRevealed={card.isColorRevealed}
                     disabled={

@@ -2,14 +2,7 @@ import type { Expansion } from "../../core/types";
 
 import { Rules } from "../rules";
 import { Card } from "./card";
-
-const mapValueToPoints: Record<Card.VALUE, number> = {
-  one: 1,
-  two: 2,
-  three: 3,
-  four: 4,
-  five: 5,
-};
+import { getCardPoints } from "../utils/get-card-points";
 
 export class Board {
   private piles: Map<Card.COLOR, Card[]> = new Map();
@@ -63,12 +56,9 @@ export class Board {
 
   public get score() {
     const score = this.getPiles().reduce((acc, pile) => {
-      const top = pile[0];
-      if (top.color === "colorless") return acc;
-
-      const points = mapValueToPoints[top.value];
-
-      return acc + points;
+      const top = pile.at(0);
+      if (!top || top.color === "colorless") return acc;
+      return acc + getCardPoints(top);
     }, 0);
 
     if (this.expansions.includes("black_powder")) {

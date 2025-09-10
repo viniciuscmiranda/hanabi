@@ -18,9 +18,9 @@ export const Room = ({ state, onReady, onRename, onDisconnect }: RoomProps) => {
       <main className="room">
         <h1>🎆 花火</h1>
         <section>
-          <ul className="players-list">
+          <ul>
             {state.players.map((player, index) => (
-              <li key={index} className="player-entry">
+              <li key={index}>
                 <div className="player-name">
                   <span>{player.ready ? "✅" : "❌"}</span>
                   <span>

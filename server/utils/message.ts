@@ -1,9 +1,9 @@
 import type { WebSocket } from "ws";
 
-import { Player } from "./game/player";
-import { Card } from "./game/card";
-import { Global } from "./global";
-import type { GameEvent } from "../core/types";
+import { Player } from "../game/player";
+import { Card } from "../game/card";
+import { Global } from "../global";
+import type { GameEvent } from "../../core/types";
 
 function send(event: (player: Player) => GameEvent) {
   Global.clients.forEach((client) => {
@@ -13,8 +13,8 @@ function send(event: (player: Player) => GameEvent) {
 }
 
 export const Message = {
-  sendGameStop() {
-    send(() => ({ event: "GAME_STOP" }));
+  sendError(ws: WebSocket, error: string) {
+    ws.send(JSON.stringify({ event: "ERROR", payload: { error } }));
   },
   sendRoomUpdate() {
     send((player) => ({
@@ -72,9 +72,5 @@ export const Message = {
         },
       };
     });
-  },
-
-  sendError(ws: WebSocket, error: string) {
-    ws.send(JSON.stringify({ event: "ERROR", payload: { error } }));
   },
 };

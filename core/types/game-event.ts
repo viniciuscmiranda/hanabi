@@ -12,18 +12,9 @@ type GameUpdateEvent = {
   payload: GameState;
 };
 
-type GameStopEvent = {
-  event: Event.GAME_STOP;
-  payload?: never;
-};
-
 type ErrorEvent = {
   event: Event.ERROR;
   payload: { error: string };
 };
 
-export type GameEvent =
-  | RoomUpdateEvent
-  | GameUpdateEvent
-  | GameStopEvent
-  | ErrorEvent;
+export type GameEvent = RoomUpdateEvent | GameUpdateEvent | ErrorEvent;
