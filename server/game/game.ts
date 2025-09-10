@@ -1,4 +1,4 @@
-import type { Log } from "../../core/types/log";
+import type { Log, Expansion } from "../../core/types";
 
 import type { Player } from "./player";
 import type { Deck } from "./deck";
@@ -192,18 +192,30 @@ export class Game {
     const drawnCard = this.deck.draw();
     player.addCard(drawnCard);
     this.lastPlayerWhoDrewIndex = this.players.indexOf(player);
-    this.log(`🃏 ${player.name} comprou uma carta.`);
+    this.log(
+      `🃏 ${player.name} comprou uma carta. (Restam ${this.deck.amountOfCards}).`
+    );
   }
 
   private checkGameFinished() {
     const livesEnded = this.lives <= 0;
     const deckEnded = this.deck.amountOfCards <= 0;
-    const lastPlayerWhoDrewPlayed =
+    const lastPlayerWhoDrewPlayedAgain =
       this.lastPlayerWhoDrewIndex === this.currentPlayerIndex;
 
-    this.isGameFinished = livesEnded || (deckEnded && lastPlayerWhoDrewPlayed);
+    this.isGameFinished =
+      livesEnded ||
+      this.board.isAllPilesFinished() ||
+      (deckEnded && lastPlayerWhoDrewPlayedAgain);
 
     if (this.isGameFinished) {
+      this.players.forEach((player) => {
+        player.hand.forEach((card) => {
+          card.reveal("value");
+          card.reveal("color");
+        });
+      });
+
       this.log(`🎉 Fim de jogo! (Pontuação: ${this.board.score}).`);
     }
 

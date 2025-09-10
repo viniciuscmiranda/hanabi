@@ -44,6 +44,7 @@ export const Message = {
           currentPlayerIndex: Global.game.currentPlayerIndex,
           isGameFinished: Global.game.isGameFinished,
           isGamePaused: Global.game.isGamePaused,
+          expansions: Global.game.board.expansions,
           discardPile: Global.game.discardPile.cards,
           board: Global.game.board.getPiles(),
           logs: Global.game.logs,

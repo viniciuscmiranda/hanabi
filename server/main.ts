@@ -98,12 +98,12 @@ wss.on("connection", (ws) => {
           Global.clients.every((client) => client.player.isReady)
         ) {
           const players = Global.clients.map((client) => client.player);
-          const cards = DeckBuilder.build();
+          const cards = DeckBuilder.build(Rules.EXPANSIONS);
 
           Global.game = new Game(
             players,
             new Deck(cards),
-            new Board(),
+            new Board(Rules.EXPANSIONS),
             new DiscardPile()
           );
 

@@ -1,113 +1,121 @@
 import { Card } from "./card";
 import type { Expansion } from "../../core/types";
 
-const Decks: Record<Card.COLOR, Card[]> = {
+type CardProps = {
+  value: Card.VALUE;
+  color: Card.COLOR;
+};
+
+const Decks: Record<Card.COLOR, CardProps[]> = {
   red: [
-    new Card("one", "red"),
-    new Card("one", "red"),
-    new Card("one", "red"),
-    new Card("two", "red"),
-    new Card("two", "red"),
-    new Card("three", "red"),
-    new Card("three", "red"),
-    new Card("four", "red"),
-    new Card("four", "red"),
-    new Card("five", "red"),
+    { value: "one", color: "red" },
+    { value: "one", color: "red" },
+    { value: "two", color: "red" },
+    { value: "two", color: "red" },
+    { value: "three", color: "red" },
+    { value: "three", color: "red" },
+    { value: "four", color: "red" },
+    { value: "four", color: "red" },
+    { value: "five", color: "red" },
   ],
   green: [
-    new Card("one", "green"),
-    new Card("one", "green"),
-    new Card("one", "green"),
-    new Card("two", "green"),
-    new Card("two", "green"),
-    new Card("three", "green"),
-    new Card("three", "green"),
-    new Card("four", "green"),
-    new Card("four", "green"),
-    new Card("five", "green"),
+    { value: "one", color: "green" },
+    { value: "one", color: "green" },
+    { value: "one", color: "green" },
+    { value: "two", color: "green" },
+    { value: "two", color: "green" },
+    { value: "three", color: "green" },
+    { value: "three", color: "green" },
+    { value: "four", color: "green" },
+    { value: "four", color: "green" },
+    { value: "five", color: "green" },
   ],
   blue: [
-    new Card("one", "blue"),
-    new Card("one", "blue"),
-    new Card("one", "blue"),
-    new Card("two", "blue"),
-    new Card("two", "blue"),
-    new Card("three", "blue"),
-    new Card("three", "blue"),
-    new Card("four", "blue"),
-    new Card("four", "blue"),
-    new Card("five", "blue"),
+    { value: "one", color: "blue" },
+    { value: "one", color: "blue" },
+    { value: "one", color: "blue" },
+    { value: "two", color: "blue" },
+    { value: "two", color: "blue" },
+    { value: "three", color: "blue" },
+    { value: "three", color: "blue" },
+    { value: "four", color: "blue" },
+    { value: "four", color: "blue" },
+    { value: "five", color: "blue" },
   ],
   yellow: [
-    new Card("one", "yellow"),
-    new Card("one", "yellow"),
-    new Card("one", "yellow"),
-    new Card("two", "yellow"),
-    new Card("two", "yellow"),
-    new Card("three", "yellow"),
-    new Card("three", "yellow"),
-    new Card("four", "yellow"),
-    new Card("four", "yellow"),
-    new Card("five", "yellow"),
+    { value: "one", color: "yellow" },
+    { value: "one", color: "yellow" },
+    { value: "one", color: "yellow" },
+    { value: "two", color: "yellow" },
+    { value: "two", color: "yellow" },
+    { value: "three", color: "yellow" },
+    { value: "three", color: "yellow" },
+    { value: "four", color: "yellow" },
+    { value: "four", color: "yellow" },
+    { value: "five", color: "yellow" },
   ],
   white: [
-    new Card("one", "white"),
-    new Card("one", "white"),
-    new Card("one", "white"),
-    new Card("two", "white"),
-    new Card("two", "white"),
-    new Card("three", "white"),
-    new Card("three", "white"),
-    new Card("four", "white"),
-    new Card("four", "white"),
-    new Card("five", "white"),
+    { value: "one", color: "white" },
+    { value: "one", color: "white" },
+    { value: "one", color: "white" },
+    { value: "two", color: "white" },
+    { value: "two", color: "white" },
+    { value: "three", color: "white" },
+    { value: "three", color: "white" },
+    { value: "four", color: "white" },
+    { value: "four", color: "white" },
+    { value: "five", color: "white" },
   ],
   multicolor: [
-    new Card("one", "multicolor"),
-    new Card("one", "multicolor"),
-    new Card("one", "multicolor"),
-    new Card("two", "multicolor"),
-    new Card("two", "multicolor"),
-    new Card("three", "multicolor"),
-    new Card("three", "multicolor"),
-    new Card("four", "multicolor"),
-    new Card("four", "multicolor"),
-    new Card("five", "multicolor"),
+    { value: "one", color: "multicolor" },
+    { value: "one", color: "multicolor" },
+    { value: "one", color: "multicolor" },
+    { value: "two", color: "multicolor" },
+    { value: "two", color: "multicolor" },
+    { value: "three", color: "multicolor" },
+    { value: "three", color: "multicolor" },
+    { value: "four", color: "multicolor" },
+    { value: "four", color: "multicolor" },
+    { value: "five", color: "multicolor" },
   ],
   colorless: [
-    new Card("one", "colorless"),
-    new Card("two", "colorless"),
-    new Card("two", "colorless"),
-    new Card("three", "colorless"),
-    new Card("three", "colorless"),
-    new Card("four", "colorless"),
-    new Card("four", "colorless"),
-    new Card("five", "colorless"),
-    new Card("five", "colorless"),
-    new Card("five", "colorless"),
+    { value: "one", color: "colorless" },
+    { value: "two", color: "colorless" },
+    { value: "two", color: "colorless" },
+    { value: "three", color: "colorless" },
+    { value: "three", color: "colorless" },
+    { value: "four", color: "colorless" },
+    { value: "four", color: "colorless" },
+    { value: "five", color: "colorless" },
+    { value: "five", color: "colorless" },
+    { value: "five", color: "colorless" },
   ],
 };
 
 export class DeckBuilder {
-  static build(...expansions: Expansion[]) {
+  static build(expansions: Expansion[]) {
     const cards: Card[] = [];
 
     cards.push(
-      ...Decks.red,
-      ...Decks.green,
-      ...Decks.blue,
-      ...Decks.yellow,
-      ...Decks.white
+      ...Decks.red.map(this.buildCard),
+      ...Decks.green.map(this.buildCard),
+      ...Decks.blue.map(this.buildCard),
+      ...Decks.yellow.map(this.buildCard),
+      ...Decks.white.map(this.buildCard)
     );
 
     if (expansions.includes("avalanche_of_colors")) {
-      cards.push(...Decks.multicolor);
+      cards.push(...Decks.multicolor.map(this.buildCard));
     }
 
     if (expansions.includes("black_powder")) {
-      cards.push(...Decks.colorless);
+      cards.push(...Decks.colorless.map(this.buildCard));
     }
 
     return cards;
+  }
+
+  private static buildCard(card: CardProps) {
+    return new Card(card.value, card.color);
   }
 }

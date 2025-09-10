@@ -4,6 +4,9 @@ type CardProps = {
   card: (Me | OtherPlayer)["hand"][number];
   disabled: boolean;
   anchorTop?: boolean;
+  showTips?: boolean;
+  isValueRevealed?: boolean;
+  isColorRevealed?: boolean;
   options?: {
     label: string;
     onClick: () => void;
@@ -19,7 +22,31 @@ const valueMap: Record<CardType.VALUE, string> = {
   five: "5",
 };
 
-export const Card = ({ card, disabled, anchorTop, options }: CardProps) => {
+const colorEmojiMap: Record<CardType.COLOR, string> = {
+  red: "🔴",
+  green: "🟢",
+  blue: "🔵",
+  yellow: "🟡",
+  white: "⚪",
+  multicolor: "🌈",
+  colorless: "⚫",
+};
+
+const valueEmojiMap: Record<CardType.VALUE, string> = {
+  one: "1️⃣",
+  two: "2️⃣",
+  three: "3️⃣",
+  four: "4️⃣",
+  five: "5️⃣",
+};
+
+export const Card = ({
+  card,
+  disabled,
+  anchorTop,
+  showTips,
+  options,
+}: CardProps) => {
   return (
     <li>
       <button
@@ -29,6 +56,16 @@ export const Card = ({ card, disabled, anchorTop, options }: CardProps) => {
         disabled={disabled}
       >
         {card.value ? valueMap[card.value] : "?"}
+        {showTips && (
+          <span className="tip">
+            {card.isColorRevealed && card.color && (
+              <span>{colorEmojiMap[card.color]}</span>
+            )}
+            {card.isValueRevealed && card.value && (
+              <span>{valueEmojiMap[card.value]}</span>
+            )}
+          </span>
+        )}
       </button>
 
       {options && options.length > 0 && (

@@ -24,7 +24,7 @@ export function App() {
     error,
   } = useGame(url);
 
-  if (error || !url) {
+  if (error || !isConnected) {
     return (
       <Setup
         error={error}
@@ -39,19 +39,6 @@ export function App() {
 
   if (isConnecting) {
     return <Loading message="Conectando-se ao servidor" />;
-  }
-
-  if (!isConnected) {
-    return (
-      <Setup
-        error="Desconectado"
-        initialValue={url}
-        onConnect={(url) => {
-          setUrl(url);
-          connect();
-        }}
-      />
-    );
   }
 
   if (!room) {
