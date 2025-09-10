@@ -1,3 +1,4 @@
+import { generateName } from "../names";
 import { Card } from "./card";
 
 export class Player {
@@ -6,6 +7,10 @@ export class Player {
   public isConnected = true;
 
   constructor(public name: string) {}
+
+  public selfRename() {
+    this.name = generateName();
+  }
 
   public addCard(card: Card) {
     this.hand.push(card);

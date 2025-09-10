@@ -133,6 +133,10 @@ export function useGame(url: string) {
     [send]
   );
 
+  const renamePlayer = useCallback(() => {
+    send({ event: "PLAYER_RENAME" });
+  }, [send]);
+
   return {
     room,
     game,
@@ -145,5 +149,6 @@ export function useGame(url: string) {
     giveTip,
     disconnect,
     connect,
+    renamePlayer,
   };
 }

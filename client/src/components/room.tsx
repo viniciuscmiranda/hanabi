@@ -4,10 +4,11 @@ import { DisconnectButton } from "./disconnect-button";
 type RoomProps = {
   state: RoomState;
   onReady: () => void;
+  onRename: () => void;
   onDisconnect: () => void;
 };
 
-export const Room = ({ state, onReady, onDisconnect }: RoomProps) => {
+export const Room = ({ state, onReady, onRename, onDisconnect }: RoomProps) => {
   const me = state.players.find((player) => player.isMe);
 
   return (
@@ -17,14 +18,25 @@ export const Room = ({ state, onReady, onDisconnect }: RoomProps) => {
       <main className="room">
         <h1>🎆 花火</h1>
         <section>
-          <ul>
+          <ul className="players-list">
             {state.players.map((player, index) => (
-              <li key={index}>
-                <span>{player.ready ? "✅" : "❌"}</span>
-                <span>
-                  {player.name}
-                  {player.isMe ? " (eu)" : ""}
-                </span>
+              <li key={index} className="player-entry">
+                <div className="player-name">
+                  <span>{player.ready ? "✅" : "❌"}</span>
+                  <span>
+                    {player.name}
+                    {player.isMe && " (eu)"}
+                  </span>
+                </div>
+                {player.isMe && (
+                  <button
+                    onClick={onRename}
+                    className="rename-button"
+                    title="Renomear"
+                  >
+                    🔃
+                  </button>
+                )}
               </li>
             ))}
           </ul>

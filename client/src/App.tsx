@@ -13,6 +13,7 @@ export function App() {
     makePlayerReady,
     playCard,
     discardCard,
+    renamePlayer,
     giveTip,
     disconnect,
     connect,
@@ -46,7 +47,12 @@ export function App() {
 
   if (!game) {
     return (
-      <Room state={room} onReady={makePlayerReady} onDisconnect={disconnect} />
+      <Room
+        state={room}
+        onReady={makePlayerReady}
+        onDisconnect={disconnect}
+        onRename={renamePlayer}
+      />
     );
   }
 

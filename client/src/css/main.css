@@ -381,6 +381,22 @@ body {
   }
 }
 
+.players-list {
+  width: 100% !important;
+  padding: 0 1rem;
+}
+
+.player-entry {
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+
+  .player-name {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
 .room footer button,
 .game-over > button,
 .setup button {
@@ -407,6 +423,7 @@ body {
 }
 
 .disconnect-button,
+.rename-button,
 .logs-button {
   position: absolute;
   top: 1rem;
@@ -424,6 +441,13 @@ body {
   &:hover {
     opacity: 0.7;
   }
+}
+
+.rename-button {
+  position: relative;
+  top: unset;
+  right: unset;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .setup {

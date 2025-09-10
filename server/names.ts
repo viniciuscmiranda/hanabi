@@ -1,3 +1,5 @@
+import { Global } from "./global";
+
 const MALE_ANIMALS = [
   "Rato",
   "Hamster",
@@ -5,6 +7,16 @@ const MALE_ANIMALS = [
   "Camundongo",
   "Castor",
   "Gabiru",
+  "Porquinho-da-índia",
+  "Tatu",
+  "Coelho",
+  "Furão",
+  "Porco-espinho",
+  "Ouriço",
+  "Lêmure",
+  "Morcego",
+  "Esquilo-voador",
+  "Arminho",
 ];
 
 const FEMALE_ANIMALS = [
@@ -13,6 +25,13 @@ const FEMALE_ANIMALS = [
   "Chinchila",
   "Topeira",
   "Ratazana",
+  "Lontra",
+  "Lebre",
+  "Doninha",
+  "Rata",
+  "Fuinha",
+  "Camundonga",
+  "Equidna",
 ];
 
 const NEUTRAL_ADJECTIVES = [
@@ -21,6 +40,39 @@ const NEUTRAL_ADJECTIVES = [
   "Sapeca",
   "Mequetrefe",
   "Besta",
+  "Triste",
+  "Infeliz",
+  "Inteligente",
+  "Vidente",
+  "Banguela",
+  "Cegueta",
+  "Baitola",
+  "Nerdola",
+  "Carente",
+  "de iPhone",
+  "Grande",
+  "Paia",
+  "Ciclista",
+  "Motorista",
+  "Captalista",
+  "Comunista",
+  "Socialista",
+  "Anarquista",
+  "Terraplanista",
+  "Conspiracionista",
+  "Capacitista",
+  "Cientista",
+  "Monarquista",
+  "Futurista",
+  "Carioca",
+  "Paulista",
+  "Taxista",
+  "Petista",
+  "Jovem",
+  "de Schrödinger",
+  "do BTS",
+  "da Twitch",
+  "Youtuber",
 ];
 
 const MALE_ADJECTIVES = [
@@ -31,6 +83,31 @@ const MALE_ADJECTIVES = [
   "Estranho",
   "Preguiçoso",
   "Inchado",
+  "Transtornado",
+  "Cabuloso",
+  "Parrudo",
+  "Maluco",
+  "Doidão",
+  "Burro",
+  "Pidão",
+  "Barato",
+  "Fedido",
+  "Curioso",
+  "Fofoqueiro",
+  "Capacho",
+  "Matemático",
+  "Viciado",
+  "Mesquinho",
+  "Voador",
+  "Anão",
+  "Armado",
+  "Motoqueiro",
+  "Piloto",
+  "Vascaino",
+  "Místico",
+  "Quântico",
+  "Tulio",
+  "Twitteiro",
 ];
 
 const FEMALE_ADJECTIVES = [
@@ -41,6 +118,27 @@ const FEMALE_ADJECTIVES = [
   "Estranha",
   "Preguiçosa",
   "Inchada",
+  "Transtornada",
+  "Cabulosa",
+  "Parruda",
+  "Maluca",
+  "Doidona",
+  "Burra",
+  "Barata",
+  "Curiosa",
+  "Fofoqueira",
+  "Matemática",
+  "Viciada",
+  "Mesquinha",
+  "Pidona",
+  "Anã",
+  "Voadora",
+  "Armada",
+  "Motoqueira",
+  "Pilota",
+  "Mística",
+  "Quântica",
+  "Twitteira",
 ];
 
 function random<T>(array: T[]) {
@@ -55,5 +153,13 @@ export function generateName() {
     ...(MALE_ANIMALS.includes(animal) ? MALE_ADJECTIVES : FEMALE_ADJECTIVES),
   ]);
 
-  return `${animal} ${adjective}`;
+  const newName = `${animal} ${adjective}`;
+
+  const playerNamesList = Global.clients.map((client) => client.player.name);
+
+  if (playerNamesList.includes(newName)) {
+    return generateName();
+  }
+
+  return newName;
 }
