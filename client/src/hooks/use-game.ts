@@ -11,7 +11,7 @@ import type {
 const TIMEOUT = 2000;
 const DELAY = 300;
 
-export function useGame() {
+export function useGame(url?: string) {
   const ws = useRef<WebSocket>(null);
   const connectionDelay = useRef<NodeJS.Timeout>(null);
   const [room, setRoom] = useState<RoomState>();
@@ -30,9 +30,6 @@ export function useGame() {
     setGame(undefined);
     setRoom(undefined);
   }, []);
-
-  // disconnect on unmount
-  useEffect(() => disconnect, [disconnect]);
 
   const connect = useCallback(
     (url: string) => {
@@ -94,6 +91,13 @@ export function useGame() {
     },
     [disconnect]
   );
+
+  // initialize connection on first render
+  useEffect(() => {
+    if (url) connect(url);
+    return () => disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const reset = useCallback(() => {
     setGame(undefined);

@@ -21,6 +21,7 @@ export const Setup = ({ error, onConnect, initial }: SetupProps) => {
       <section>
         {error && <p>{error}</p>}
         <input
+          autoFocus
           type="text"
           placeholder="URL do servidor"
           value={value}

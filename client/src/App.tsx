@@ -6,6 +6,8 @@ import { Game } from "./components/game";
 import { Setup } from "./components/setup";
 
 export function App() {
+  const url = new URLSearchParams(window.location.search).get("server") || "";
+
   const {
     makePlayerReady,
     renamePlayer,
@@ -21,17 +23,13 @@ export function App() {
     isConnected,
     isConnecting,
     error,
-  } = useGame();
+  } = useGame(url);
 
   if (isConnecting) {
     return <Loading message="Conectando-se ao servidor" />;
   }
 
   if (!isConnected) {
-    const url =
-      new URLSearchParams(window.location.search).get("server") ||
-      "ws://localhost:8080";
-
     return (
       <Setup
         error={error}
