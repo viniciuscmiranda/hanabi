@@ -5,6 +5,7 @@ import type {
   GameEvent,
   PlayerEvent,
   Card,
+  Expansion,
 } from "../../../core/types";
 
 const TIMEOUT = 2000;
@@ -135,6 +136,13 @@ export function useGame() {
     send({ event: "PLAYER_RENAME" });
   }, [send]);
 
+  const setExpansions = useCallback(
+    (expansions: Expansion[]) => {
+      send({ event: "PLAYER_SET_EXPANSIONS", payload: { expansions } });
+    },
+    [send]
+  );
+
   return {
     room,
     game,
@@ -143,6 +151,7 @@ export function useGame() {
     isConnecting,
     makePlayerReady,
     renamePlayer,
+    setExpansions,
     playCard,
     discardCard,
     giveTip,

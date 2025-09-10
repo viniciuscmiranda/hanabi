@@ -20,6 +20,7 @@ export const Message = {
     send((player) => ({
       event: "ROOM_UPDATE",
       payload: {
+        expansions: Global.expansions,
         players: Global.clients.map((c) => ({
           isMe: c.player === player,
           ready: c.player.isReady,

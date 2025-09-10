@@ -75,6 +75,12 @@ body {
     background-color: var(--color-overlay-secondary);
   }
 
+  h4 {
+    margin-bottom: 0.65rem;
+    font-size: 1.2rem;
+    text-align: left;
+  }
+
   section {
     padding: 1rem;
 
@@ -620,5 +626,39 @@ body {
 
   .discard-modal ul {
     width: 100%;
+  }
+}
+
+.expansions {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-overlay-secondary);
+  padding-bottom: 1.5rem;
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  button {
+    text-align: left;
+    color: var(--color-text);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+    padding: none;
+    background: none;
+    background-color: var(--color-overlay-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+
+    &:hover {
+      opacity: 0.7;
+    }
   }
 }

@@ -9,6 +9,7 @@ export function App() {
   const {
     makePlayerReady,
     renamePlayer,
+    setExpansions,
     playCard,
     discardCard,
     giveTip,
@@ -53,6 +54,7 @@ export function App() {
         onReady={makePlayerReady}
         onRename={renamePlayer}
         onDisconnect={disconnect}
+        onSetExpansions={setExpansions}
       />
     );
   }

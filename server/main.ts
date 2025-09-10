@@ -85,12 +85,12 @@ wss.on("connection", (ws) => {
           Global.clients.every((client) => client.player.isReady)
         ) {
           const players = Global.clients.map((client) => client.player);
-          const cards = DeckBuilder.build(Rules.EXPANSIONS);
+          const cards = DeckBuilder.build(Global.expansions);
 
           Global.game = new Game(
             players,
             new Deck(cards),
-            new Board(Rules.EXPANSIONS),
+            new Board(Global.expansions),
             new DiscardPile()
           );
 
@@ -101,6 +101,11 @@ wss.on("connection", (ws) => {
       case "PLAYER_RENAME":
         if (Global.game) return;
         player.rename();
+        Message.sendRoomUpdate();
+        break;
+      case "PLAYER_SET_EXPANSIONS":
+        if (Global.game) return;
+        Global.expansions = payload.expansions;
         Message.sendRoomUpdate();
         break;
     }

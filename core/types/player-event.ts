@@ -1,5 +1,6 @@
 import type { Card } from "./card";
 import type { Event } from "./event";
+import type { Expansion } from "./expansion";
 
 type PlayerReadyEvent = {
   event: Event.PLAYER_READY;
@@ -34,9 +35,17 @@ type PlayerRenameEvent = {
   payload?: never;
 };
 
+type PlayerSetExpansionsEvent = {
+  event: Event.PLAYER_SET_EXPANSIONS;
+  payload: {
+    expansions: Expansion[];
+  };
+};
+
 export type PlayerEvent =
   | PlayerReadyEvent
   | PlayerPlayEvent
   | PlayerDiscardEvent
   | PlayerGiveTipEvent
-  | PlayerRenameEvent;
+  | PlayerRenameEvent
+  | PlayerSetExpansionsEvent;
