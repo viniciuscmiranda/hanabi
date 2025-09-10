@@ -45,7 +45,7 @@ export const Board = ({ state }: BoardProps) => {
 
         <section className="discard" onClick={() => setShowDiscardModal(true)}>
           <section className="info">
-            <span title="Descarte">🃏 {state.discardPile.length}</span>
+            <span title="Descarte">🗑️ {state.discardPile.length}</span>
           </section>
           {!state.discardPile.length && <i>Nada</i>}
           <ul>
