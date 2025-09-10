@@ -28,16 +28,21 @@ export function App() {
   }
 
   if (!isConnected) {
-    const url = sessionStorage.getItem("url") || "ws://localhost:8080";
-    const setUrl = (url: string) => sessionStorage.setItem("url", url);
+    const url =
+      new URLSearchParams(window.location.search).get("server") ||
+      "ws://localhost:8080";
 
     return (
       <Setup
         error={error}
         initial={url}
         onConnect={(url) => {
-          setUrl(url);
           connect(url);
+          window.history.replaceState(
+            {},
+            "",
+            `${window.location.pathname}?server=${url}`
+          );
         }}
       />
     );
