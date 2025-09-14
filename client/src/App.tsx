@@ -15,11 +15,6 @@ function setURL(url: string) {
   );
 }
 
-// TODO: add game rules
-// TODO: add links to source code
-// TODO: reactions
-// TODO: add suggestions box
-// TODO: README
 export function App() {
   const url = new URLSearchParams(window.location.search).get("server") || "";
 

@@ -25,7 +25,6 @@ function formatError(error: Error) {
   return JSON.stringify(message);
 }
 
-// TODO: add unit tests
 wss.on("connection", (ws, request) => {
   const room = (() => {
     const roomId = request.url?.split("/").at(-1);

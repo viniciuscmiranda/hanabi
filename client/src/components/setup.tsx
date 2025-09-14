@@ -17,7 +17,9 @@ export const Setup = ({ error, onConnect, initialURL }: SetupProps) => {
         if (value) onConnect(value);
       }}
     >
-      <h1>🎆 花火</h1>
+      <header>
+        <h1>🎆 花火</h1>
+      </header>
       <section>
         {error && <p>{error}</p>}
         <input
