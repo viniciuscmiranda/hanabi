@@ -5,6 +5,7 @@ export class Player {
   public hand: Card[] = [];
   public isReady = false;
   public isConnected = true;
+  public isWatching = false;
   public name: string;
 
   constructor() {
@@ -25,7 +26,9 @@ export class Player {
   }
 
   public getCardByIndex(cardIndex: number) {
-    return this.hand.at(cardIndex);
+    const card = this.hand.at(cardIndex);
+    if (!card) throw new Error("Carta não encontrada.");
+    return card;
   }
 
   public discardHand() {

@@ -70,9 +70,14 @@ body {
   background-color: var(--color-bg-secondary);
   text-align: center;
 
-  h1 {
+  header {
     padding: 1rem;
     background-color: var(--color-overlay-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
   }
 
   h4 {
@@ -99,7 +104,7 @@ body {
         justify-content: space-between;
         gap: 0.5rem;
         font-size: 1.2rem;
-        height: 2.5rem;
+        height: 3.5rem;
 
         .player-name {
           display: flex;
@@ -109,8 +114,35 @@ body {
     }
 
     footer {
+      margin-top: 1rem;
+
       button {
         width: 100%;
+      }
+
+      .share-button {
+        margin-top: 0.75rem;
+        background: none;
+        border: none;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        padding: 0;
+        font-weight: normal;
+
+        &:enabled {
+          cursor: pointer;
+
+          &:hover {
+            background: none;
+            color: var(--color-text-disabled);
+          }
+        }
+
+        &:disabled {
+          background: none;
+          color: var(--color-text-disabled);
+          cursor: not-allowed;
+        }
       }
     }
   }
@@ -375,6 +407,18 @@ body {
     gap: 0.5rem;
     flex-wrap: wrap;
     margin: 0 auto;
+
+    div {
+      position: relative;
+
+      span {
+        z-index: 1000;
+        font-size: 1rem;
+        top: 0.45rem;
+        right: 0.15rem;
+        position: absolute;
+      }
+    }
   }
 }
 
@@ -395,14 +439,36 @@ body {
     padding: 0;
     gap: 0.5rem;
   }
+
+  &:has(span:hover) {
+    opacity: 0;
+  }
+
+  span {
+    padding: 0.5rem 1rem;
+    cursor: default;
+    color: var(--color-text-disabled);
+  }
+
+  & > button {
+    background: transparent;
+    border: none;
+    padding: 1rem;
+    color: var(--color-text);
+    font-size: 1.1rem;
+
+    &:enabled:hover {
+      cursor: pointer;
+      color: var(--color-text-disabled);
+    }
+  }
 }
 
 .room footer button,
-.game-over > button,
+.game-over > footer button,
 .setup button {
-  width: 10rem;
   margin-top: 1rem;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.5rem;
   color: var(--color-text);
@@ -423,7 +489,7 @@ body {
 }
 
 .disconnect-button,
-.rename-button,
+.player-actions button,
 .logs-button {
   position: absolute;
   top: 1rem;
@@ -443,7 +509,12 @@ body {
   }
 }
 
-.rename-button {
+.player-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.player-actions button {
   position: relative;
   top: unset;
   right: unset;
@@ -494,21 +565,57 @@ body {
     display: block;
   }
 
-  ul {
+  div {
     max-width: 25rem;
-    max-height: 15rem;
+    max-height: 25rem;
+    opacity: 0.9;
     overflow-y: auto;
-    list-style: none;
-    padding-left: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
     background-color: var(--color-bg-secondary);
     border-radius: 0.5rem;
-    padding: 1rem;
 
-    time {
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 0.5rem;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: var(--color-bg);
+    }
+
+    label {
+      position: sticky;
+      top: 0;
+      padding: 1rem;
+      background-color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
       font-weight: bold;
+
+      &:hover {
+        color: var(--color-text-disabled);
+      }
+
+      input {
+        accent-color: var(--color-primary);
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+
+    ul {
+      padding: 0 1rem 1rem 1rem;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      time {
+        font-weight: bold;
+      }
     }
   }
 }
@@ -520,6 +627,15 @@ body {
   &:hover + .logs {
     display: block;
   }
+}
+
+.watch-mode {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  opacity: 0.7;
+  z-index: 2000;
+  font-size: 1.2rem;
 }
 
 @media (max-width: 800px) {
@@ -599,7 +715,7 @@ body {
     right: 1rem;
     padding-bottom: 0;
 
-    ul {
+    div {
       max-width: unset;
     }
   }
@@ -629,7 +745,8 @@ body {
   }
 }
 
-.expansions {
+.expansions,
+.settings {
   width: 100%;
   text-align: left;
   margin-bottom: 1.5rem;
@@ -649,7 +766,6 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    cursor: pointer;
     border: none;
     padding: none;
     background: none;
@@ -657,8 +773,18 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
 
-    &:hover {
-      opacity: 0.7;
+    &:enabled {
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: transparent;
+      padding-left: 0;
     }
   }
 }

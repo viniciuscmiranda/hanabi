@@ -48,61 +48,64 @@ export const Game = ({
       <DisconnectButton onDisconnect={onDisconnect} />
 
       {state.isGamePaused && !state.isGameFinished && <Pause />}
+      {state.isWatchMode && <span className="watch-mode">Modo espectador</span>}
       {state.isGameFinished && <GameOver onReset={onReset} state={state} />}
 
       <section className="players">
         <ul>
-          {players.map((player) => (
-            <Hand
-              key={player.index}
-              isMe={player.isMe}
-              isCurrent={state.currentPlayerIndex === player.index}
-              name={`${player.name} (${player.index + 1})`}
-            >
-              {player.hand.map((card, index) => {
-                const myHandOptions = [
-                  {
-                    label: "Jogar",
-                    onClick: () => onPlayCard(index),
-                  },
-                  {
-                    label: "Descartar",
-                    onClick: () => onDiscardCard(index),
-                  },
-                ];
+          {players.map((player, index) => {
+            return (
+              <Hand
+                key={player.index}
+                isMe={state.isWatchMode ? index === 0 : player.isMe}
+                isCurrent={state.currentPlayerIndex === player.index}
+                name={`${player.name} (${player.index + 1})`}
+              >
+                {player.hand.map((card, index) => {
+                  const myHandOptions = [
+                    {
+                      label: "Jogar",
+                      onClick: () => onPlayCard(index),
+                    },
+                    {
+                      label: "Descartar",
+                      onClick: () => onDiscardCard(index),
+                    },
+                  ];
 
-                const otherHandOptions = [
-                  {
-                    label: "Cor",
-                    onClick: () => onGiveTip(player.index, index, "color"),
-                    disabled:
-                      card.isColorRevealed || card.color === "colorless",
-                  },
-                  {
-                    label: "Número",
-                    onClick: () => onGiveTip(player.index, index, "value"),
-                    disabled: card.isValueRevealed,
-                  },
-                ];
+                  const otherHandOptions = [
+                    {
+                      label: "Cor",
+                      onClick: () => onGiveTip(player.index, index, "color"),
+                      disabled:
+                        card.isColorRevealed || card.color === "colorless",
+                    },
+                    {
+                      label: "Número",
+                      onClick: () => onGiveTip(player.index, index, "value"),
+                      disabled: card.isValueRevealed,
+                    },
+                  ];
 
-                return (
-                  <Card
-                    key={index}
-                    card={card}
-                    anchorTop={player.isMe}
-                    options={player.isMe ? myHandOptions : otherHandOptions}
-                    showTips={!player.isMe && !state.isGameFinished}
-                    isValueRevealed={card.isValueRevealed}
-                    isColorRevealed={card.isColorRevealed}
-                    disabled={
-                      !state.isGameFinished &&
-                      (!isMyTurn || (!player.isMe && state.tips <= 0))
-                    }
-                  />
-                );
-              })}
-            </Hand>
-          ))}
+                  return (
+                    <Card
+                      key={index}
+                      card={card}
+                      anchorTop={player.isMe}
+                      options={player.isMe ? myHandOptions : otherHandOptions}
+                      showTips={!player.isMe && !state.isGameFinished}
+                      isValueRevealed={card.isValueRevealed}
+                      isColorRevealed={card.isColorRevealed}
+                      disabled={
+                        !state.isGameFinished &&
+                        (!isMyTurn || (!player.isMe && state.tips <= 0))
+                      }
+                    />
+                  );
+                })}
+              </Hand>
+            );
+          })}
         </ul>
       </section>
 

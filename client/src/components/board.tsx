@@ -68,9 +68,16 @@ export const Board = ({ state }: BoardProps) => {
               return (
                 <li key={index}>
                   <ul>
-                    {cards.map((card, index) => (
-                      <Card key={index} card={card} disabled />
-                    ))}
+                    {cards.map((card, index) => {
+                      const isLastDiscarded = state.discardPile.at(-1) === card;
+
+                      return (
+                        <div>
+                          {isLastDiscarded && <span>❕</span>}
+                          <Card key={index} card={card} disabled />
+                        </div>
+                      );
+                    })}
                   </ul>
                 </li>
               );

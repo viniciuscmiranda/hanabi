@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { useGame } from "./hooks/use-game";
 
 import { Room } from "./components/room";
@@ -5,13 +7,29 @@ import { Loading } from "./components/loading";
 import { Game } from "./components/game";
 import { Setup } from "./components/setup";
 
+function setURL(url: string) {
+  window.history.replaceState(
+    {},
+    "",
+    `${window.location.pathname}?server=${url}`
+  );
+}
+
+// TODO: add game rules
+// TODO: add links to source code
+// TODO: reactions
+// TODO: add suggestions box
+// TODO: README
 export function App() {
   const url = new URLSearchParams(window.location.search).get("server") || "";
 
   const {
     makePlayerReady,
     renamePlayer,
-    setExpansions,
+    setRoomSettings,
+    setWatchMode,
+    setLeader,
+    kickPlayer,
     playCard,
     discardCard,
     giveTip,
@@ -25,6 +43,14 @@ export function App() {
     error,
   } = useGame(url);
 
+  useEffect(() => {
+    const roomId = room?.roomId;
+
+    if (roomId && !url.includes(roomId)) {
+      setURL(`${url}/${roomId}`);
+    }
+  }, [room?.roomId, url]);
+
   if (isConnecting) {
     return <Loading message="Conectando-se ao servidor" />;
   }
@@ -33,14 +59,10 @@ export function App() {
     return (
       <Setup
         error={error}
-        initial={url}
+        initialURL={url}
         onConnect={(url) => {
           connect(url);
-          window.history.replaceState(
-            {},
-            "",
-            `${window.location.pathname}?server=${url}`
-          );
+          setURL(url);
         }}
       />
     );
@@ -57,7 +79,10 @@ export function App() {
         onReady={makePlayerReady}
         onRename={renamePlayer}
         onDisconnect={disconnect}
-        onSetExpansions={setExpansions}
+        onSetRoomSettings={setRoomSettings}
+        onSetWatchMode={setWatchMode}
+        onSetLeader={setLeader}
+        onKickPlayer={kickPlayer}
       />
     );
   }

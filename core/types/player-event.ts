@@ -1,6 +1,6 @@
 import type { Card } from "./card";
 import type { Event } from "./event";
-import type { Expansion } from "./expansion";
+import type { RoomSettings } from "./room-settings";
 
 type PlayerReadyEvent = {
   event: Event.PLAYER_READY;
@@ -35,10 +35,29 @@ type PlayerRenameEvent = {
   payload?: never;
 };
 
-type PlayerSetExpansionsEvent = {
-  event: Event.PLAYER_SET_EXPANSIONS;
+type PlayerSetWatchModeEvent = {
+  event: Event.PLAYER_SET_WATCH_MODE;
   payload: {
-    expansions: Expansion[];
+    isWatchMode: boolean;
+  };
+};
+
+type PlayerSetRoomSettingsEvent = {
+  event: Event.PLAYER_SET_ROOM_SETTINGS;
+  payload: RoomSettings;
+};
+
+type PlayerSetLeaderEvent = {
+  event: Event.PLAYER_SET_LEADER;
+  payload: {
+    playerIndex: number;
+  };
+};
+
+type PlayerKickPlayerEvent = {
+  event: Event.PLAYER_KICK_PLAYER;
+  payload: {
+    playerIndex: number;
   };
 };
 
@@ -48,4 +67,7 @@ export type PlayerEvent =
   | PlayerDiscardEvent
   | PlayerGiveTipEvent
   | PlayerRenameEvent
-  | PlayerSetExpansionsEvent;
+  | PlayerSetWatchModeEvent
+  | PlayerSetRoomSettingsEvent
+  | PlayerSetLeaderEvent
+  | PlayerKickPlayerEvent;

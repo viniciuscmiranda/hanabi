@@ -6,14 +6,14 @@ import type { Board } from "./board";
 import type { DiscardPile } from "./discard-pile";
 import { Rules } from "../rules";
 import { Card } from "./card";
-import { Readable } from "../utils/readable";
+import { Format } from "../utils/format";
 
 export class Game {
   public turnNumber = 0;
   public lives = Rules.MAX_LIVES;
   public tips = Rules.MAX_TIPS;
   public isGameFinished = false;
-  public lastPlayerWhoDrewIndex = 0;
+  public playerWhoDrewLastCard: Player | null = null;
   public logs: Log[] = [];
 
   constructor(
@@ -26,7 +26,9 @@ export class Game {
       this.players.length < Rules.MIN_PLAYERS ||
       this.players.length > Rules.MAX_PLAYERS
     ) {
-      throw new Error("Invalid number of players");
+      throw new Error(
+        `Número de jogadores deve ser entre ${Rules.MIN_PLAYERS} e ${Rules.MAX_PLAYERS}.`
+      );
     }
   }
 
@@ -53,26 +55,22 @@ export class Game {
     cardIndex: number,
     info: Card.INFO
   ) {
-    if (
-      this.isGamePaused ||
-      !this.isPlayerTurn(player) ||
-      this.tips <= 0 ||
-      player === selectedPlayer
-    ) {
-      return;
+    this.throwIfPlayerCannotPlay(player);
+
+    if (this.tips <= 0) throw new Error("Você não tem mais dicas.");
+    if (player === selectedPlayer) {
+      throw new Error("Você não pode dar uma dica para si mesmo.");
     }
 
     const selectedCard = selectedPlayer.getCardByIndex(cardIndex);
-    if (!selectedCard) return;
 
     const isColorTip = info === "color";
     const isValueTip = info === "value";
 
     if (selectedCard.color === "colorless" && isColorTip) {
-      return;
+      throw new Error("Você não pode dar uma dica para uma carta sem cor.");
     }
 
-    this.tips--;
     const cardsToReveal = selectedPlayer.hand.filter((card) => {
       const isSameValue = card.value === selectedCard.value;
       const isSameColor = card.color === selectedCard.color;
@@ -80,12 +78,11 @@ export class Game {
       return (isValueTip && isSameValue) || (isColorTip && isSameColor);
     });
 
-    cardsToReveal.forEach((card) => {
-      card.reveal(info);
-    });
+    this.tips--;
+    cardsToReveal.forEach((card) => card.reveal(info));
 
     this.log(
-      `💡 ${player.name} deu a dica ${Readable.info(info, selectedCard)} em ${
+      `💡 ${player.name} deu a dica ${Format.info(info, selectedCard)} em ${
         cardsToReveal.length
       } cartas para ${selectedPlayer.name} (Restam ${this.tips}/${
         Rules.MAX_TIPS
@@ -97,30 +94,19 @@ export class Game {
   }
 
   public playCard(player: Player, cardIndex: number) {
-    if (this.isGamePaused || !this.isPlayerTurn(player)) return;
+    this.throwIfPlayerCannotPlay(player);
 
     const playedCard = player.getCardByIndex(cardIndex);
-    if (!playedCard) return;
-
-    this.log(`🃏 ${player.name} jogou ${Readable.card(playedCard)}.`);
+    this.log(`🃏 ${player.name} jogou ${Format.card(playedCard)}.`);
 
     player.removeCard(playedCard);
     const wasAddedToTheBoard = this.board.add(playedCard);
 
     if (!wasAddedToTheBoard) {
       this.discardPile.add(playedCard);
-      this.lives--;
-      this.log(
-        `💔 ${player.name} perdeu uma vida (Restam ${this.lives}/${Rules.MAX_LIVES}).`
-      );
-    } else if (
-      this.board.isPileFinished(playedCard.color) &&
-      this.tips < Rules.MAX_TIPS
-    ) {
-      this.tips++;
-      this.log(
-        `💡 ${player.name} ganhou uma dica (Restam ${this.tips}/${Rules.MAX_TIPS}).`
-      );
+      this.loseLife();
+    } else if (this.board.isPileFinished(playedCard.color)) {
+      this.addTip();
     }
 
     if (this.checkGameFinished()) return;
@@ -129,22 +115,15 @@ export class Game {
   }
 
   public discardCard(player: Player, cardIndex: number) {
-    if (this.isGamePaused || !this.isPlayerTurn(player)) return;
+    this.throwIfPlayerCannotPlay(player);
 
     const discardedCard = player.getCardByIndex(cardIndex);
-    if (!discardedCard) return;
-
-    this.log(`🃏 ${player.name} descartou ${Readable.card(discardedCard)}.`);
+    this.log(`🗑️ ${player.name} descartou ${Format.card(discardedCard)}.`);
 
     player.removeCard(discardedCard);
     this.discardPile.add(discardedCard);
 
-    if (this.tips < Rules.MAX_TIPS) {
-      this.tips++;
-      this.log(
-        `💡 ${player.name} ganhou uma dica (Restam ${this.tips}/${Rules.MAX_TIPS}).`
-      );
-    }
+    this.addTip();
 
     if (this.checkGameFinished()) return;
     this.drawCard(player);
@@ -168,32 +147,33 @@ export class Game {
   }
 
   private drawCard(player: Player) {
-    if (
-      this.isGamePaused ||
-      !this.isPlayerTurn(player) ||
-      this.deck.amountOfCards <= 0
-    ) {
-      return;
-    }
+    if (this.deck.amountOfCards <= 0) return;
 
-    const drawnCard = this.deck.draw();
-    player.addCard(drawnCard);
-    this.lastPlayerWhoDrewIndex = this.players.indexOf(player);
+    player.addCard(this.deck.draw());
+    this.playerWhoDrewLastCard = player;
+
     this.log(
       `🃏 ${player.name} comprou uma carta. (Restam ${this.deck.amountOfCards}).`
+    );
+  }
+
+  private endTurn() {
+    this.turnNumber++;
+    this.log(
+      `🔄 Turno de ${this.currentPlayer.name} (Rodada ${this.roundNumber}).`
     );
   }
 
   private checkGameFinished() {
     const livesEnded = this.lives <= 0;
     const deckEnded = this.deck.amountOfCards <= 0;
-    const lastPlayerWhoDrewPlayedAgain =
-      this.lastPlayerWhoDrewIndex === this.currentPlayerIndex;
+    const playerWhoDrewLastCardPlayedAgain =
+      this.playerWhoDrewLastCard === this.currentPlayer;
 
     this.isGameFinished =
       livesEnded ||
-      this.board.isAllPilesFinished() ||
-      (deckEnded && lastPlayerWhoDrewPlayedAgain);
+      (deckEnded && playerWhoDrewLastCardPlayedAgain) ||
+      this.board.isAllPilesFinished();
 
     if (this.isGameFinished) {
       this.players.forEach((player) => {
@@ -209,15 +189,27 @@ export class Game {
     return this.isGameFinished;
   }
 
-  private endTurn() {
-    this.turnNumber++;
+  private loseLife() {
+    this.lives--;
     this.log(
-      `🔄 Turno de ${this.currentPlayer.name} (Rodada ${this.roundNumber}).`
+      `💔 ${this.currentPlayer.name} perdeu uma vida (Restam ${this.lives}/${Rules.MAX_LIVES}).`
     );
   }
 
-  private isPlayerTurn(player: Player) {
-    return this.currentPlayerIndex === this.players.indexOf(player);
+  private addTip() {
+    if (this.tips < Rules.MAX_TIPS) {
+      this.tips++;
+      this.log(
+        `💡 ${this.currentPlayer.name} ganhou uma dica (Restam ${this.tips}/${Rules.MAX_TIPS}).`
+      );
+    }
+  }
+
+  private throwIfPlayerCannotPlay(player: Player) {
+    if (this.isGamePaused) throw new Error("O jogo está pausado.");
+    if (this.currentPlayer !== player)
+      throw new Error(`É o turno de${this.currentPlayer.name}.`);
+    return true;
   }
 
   private log(message: string) {

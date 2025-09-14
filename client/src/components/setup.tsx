@@ -2,12 +2,12 @@ import { useState } from "react";
 
 type SetupProps = {
   error?: string;
-  initial?: string;
+  initialURL?: string;
   onConnect: (url: string) => void;
 };
 
-export const Setup = ({ error, onConnect, initial }: SetupProps) => {
-  const [value, setValue] = useState(initial);
+export const Setup = ({ error, onConnect, initialURL }: SetupProps) => {
+  const [value, setValue] = useState(initialURL);
 
   return (
     <form
@@ -21,6 +21,7 @@ export const Setup = ({ error, onConnect, initial }: SetupProps) => {
       <section>
         {error && <p>{error}</p>}
         <input
+          name="url"
           autoFocus
           type="text"
           placeholder="URL do servidor"

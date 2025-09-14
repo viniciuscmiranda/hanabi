@@ -1,5 +1,9 @@
-import type { GameState } from "../../../core/types";
+import { useState } from "react";
+
 import { Card } from "./card";
+import { Format } from "../utils/format";
+
+import type { GameState } from "../../../core/types";
 
 type GameOverProps = {
   state: GameState;
@@ -7,30 +11,43 @@ type GameOverProps = {
 };
 
 export const GameOver = ({ state, onReset }: GameOverProps) => {
-  function getScoreQuality() {
-    if (state.score <= 5) return "Horrível, vaias da multidão...";
-    if (state.score <= 10) return "Medíocre, mal se ouvem aplausos.";
-    if (state.score <= 15) return "Honroso, mas não fica na memória...";
-    if (state.score <= 20) return "✨ Excelente, encanta a multidão.";
-    if (state.score <= 24) return "💫 Extraordinário, ficará na memória!";
-    if (state.score <= 29)
-      return "⭐ Lendário, adultos e crianças atônitos, estrelas em seus olhos!";
-    return "🌟 Divino, até o céu se agita!";
+  const [isCopied, setIsCopied] = useState(false);
+
+  function onShare() {
+    const text = `🎆 花火 - Hanabi
+
+🏆 ${state.score} pontos
+${Format.score(state.score)}
+
+${state.board.map((pile) => `${Format.card(pile[0])}`).join("\n")}
+
+${window.location.origin}`;
+
+    navigator.clipboard.writeText(text);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
   }
 
   return (
     <div className="game-over">
       <h2>Fim de Jogo</h2>
       <p>Pontuação: {state.score}</p>
-      <p>{getScoreQuality()}</p>
+      <p>{Format.score(state.score)}</p>
 
       <ul>
         {state.board.map((pile, index) => (
           <Card key={index} card={pile[0]} disabled />
         ))}
       </ul>
+      <footer>
+        <button onClick={onReset}>Voltar para a sala</button>
+      </footer>
 
-      <button onClick={onReset}>Reiniciar</button>
+      <button onClick={onShare} disabled={isCopied}>
+        {isCopied ? "Copiado!" : "Compartilhar"}
+      </button>
     </div>
   );
 };

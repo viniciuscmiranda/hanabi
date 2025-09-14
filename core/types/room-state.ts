@@ -1,10 +1,13 @@
-import type { Expansion } from "./expansion";
+import type { RoomSettings } from "./room-settings";
 
 export type RoomState = {
-  expansions: Expansion[];
+  roomId: string;
+  settings: RoomSettings;
   players: {
     name: string;
     isMe: boolean;
     ready: boolean;
+    isWatching: boolean;
+    isLeader: boolean;
   }[];
 };

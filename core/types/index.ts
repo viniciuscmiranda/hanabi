@@ -3,6 +3,7 @@ export * from "./game-event";
 export * from "./player-event";
 export * from "./game-state";
 export * from "./room-state";
+export * from "./room-settings";
 export * from "./card";
 export * from "./expansion";
 export * from "./log";

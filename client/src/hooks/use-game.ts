@@ -1,11 +1,12 @@
 import { useRef, useEffect, useCallback, useState } from "react";
+
 import type {
   RoomState,
   GameState,
   GameEvent,
   PlayerEvent,
   Card,
-  Expansion,
+  RoomSettings,
 } from "../../../core/types";
 
 const TIMEOUT = 2000;
@@ -140,9 +141,30 @@ export function useGame(url?: string) {
     send({ event: "PLAYER_RENAME" });
   }, [send]);
 
-  const setExpansions = useCallback(
-    (expansions: Expansion[]) => {
-      send({ event: "PLAYER_SET_EXPANSIONS", payload: { expansions } });
+  const setRoomSettings = useCallback(
+    (settings: RoomSettings) => {
+      send({ event: "PLAYER_SET_ROOM_SETTINGS", payload: settings });
+    },
+    [send]
+  );
+
+  const setWatchMode = useCallback(
+    (isWatchMode: boolean) => {
+      send({ event: "PLAYER_SET_WATCH_MODE", payload: { isWatchMode } });
+    },
+    [send]
+  );
+
+  const setLeader = useCallback(
+    (playerIndex: number) => {
+      send({ event: "PLAYER_SET_LEADER", payload: { playerIndex } });
+    },
+    [send]
+  );
+
+  const kickPlayer = useCallback(
+    (playerIndex: number) => {
+      send({ event: "PLAYER_KICK_PLAYER", payload: { playerIndex } });
     },
     [send]
   );
@@ -155,7 +177,10 @@ export function useGame(url?: string) {
     isConnecting,
     makePlayerReady,
     renamePlayer,
-    setExpansions,
+    setRoomSettings,
+    setWatchMode,
+    setLeader,
+    kickPlayer,
     playCard,
     discardCard,
     giveTip,
