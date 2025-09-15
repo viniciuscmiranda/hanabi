@@ -17,6 +17,16 @@ export class Messenger {
     });
   }
 
+  public sendPlayerReact(reaction: string, ws?: WebSocket) {
+    this.send(
+      () => ({
+        event: "PLAYER_REACT",
+        payload: { reaction },
+      }),
+      ws
+    );
+  }
+
   public sendRoomState(ws?: WebSocket) {
     this.send(
       (player) => ({

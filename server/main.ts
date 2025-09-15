@@ -1,7 +1,8 @@
-import { WebSocketServer, type WebSocket } from "ws";
+import { WebSocketServer } from "ws";
 
 import { Room } from "./game/room";
 import type { GameEvent, PlayerEvent } from "../core/types";
+import { validateMessage } from "./utils/validate-message";
 
 const wss = new WebSocketServer({ port: 8080 });
 const rooms = new Map<string, Room>();
@@ -48,9 +49,8 @@ wss.on("connection", (ws, request) => {
   }
 
   ws.on("message", (raw) => {
-    const data = (JSON.parse(raw.toString()) || {}) as PlayerEvent;
-
     try {
+      const data = validateMessage(JSON.parse(raw.toString()));
       room.handlePlayerEvent(ws, data);
     } catch (error) {
       ws.send(formatError(error));

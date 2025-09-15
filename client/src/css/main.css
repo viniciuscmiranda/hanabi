@@ -174,7 +174,6 @@ body {
   padding: 1rem;
 
   h3 {
-    margin-bottom: 1rem;
     text-align: center;
     font-size: 1.3rem;
   }
@@ -190,6 +189,7 @@ body {
   position: relative;
   margin: 0 auto;
   width: max-content;
+  margin-top: 1rem;
 
   .options {
     z-index: 2000;
@@ -253,7 +253,7 @@ body {
 
 .me {
   position: absolute;
-  bottom: 2rem;
+  bottom: 4rem;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -634,12 +634,109 @@ body {
 }
 
 .watch-mode {
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
+  text-align: center;
   opacity: 0.7;
-  z-index: 2000;
   font-size: 1.2rem;
+  display: block;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 2.7rem);
+  bottom: 0;
+}
+
+.reactions {
+  ul {
+    padding: 0;
+    list-style: none;
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    z-index: 2000;
+
+    li {
+      --index: attr(data-index type(<number>));
+      opacity: 0;
+      transform: translateY(calc(4.5rem * var(--index))) scale(0.2)
+        rotate(180deg);
+      transition-property: opacity, transform;
+      transition: 0.25s ease;
+
+      &:first-child {
+        opacity: 1;
+        transform: none;
+        z-index: 1;
+      }
+
+      button {
+        font-size: 2rem;
+        border: none;
+        background: none;
+        border-radius: 50%;
+        background-color: var(--color-bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    &:hover > li {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .active-reactions {
+    position: absolute;
+    z-index: 2000;
+    inset: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 900px;
+    width: 100%;
+    pointer-events: none;
+    overflow: hidden;
+
+    span {
+      --position: attr(data-position type(<number>));
+
+      position: absolute;
+      left: clamp(6rem, calc(var(--position) * 1%), calc(100% - 6rem));
+      bottom: -6rem;
+      font-size: 6rem;
+      animation: reaction-float 4s ease-in-out forwards,
+        reaction-fade 3.5s ease forwards;
+    }
+  }
+}
+
+@keyframes reaction-float {
+  from {
+    transform: translateY(0) scale(0.5);
+  }
+
+  to {
+    transform: translateY(-80vh) scale(1);
+  }
+}
+
+@keyframes reaction-fade {
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 800px) {
@@ -789,6 +886,12 @@ body {
       cursor: not-allowed;
       background-color: transparent;
       padding-left: 0;
+    }
+  }
+
+  .active-reactions {
+    span {
+      font-size: 4rem;
     }
   }
 }

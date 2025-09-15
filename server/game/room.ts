@@ -22,9 +22,8 @@ export class Room {
   public expansions: Expansion[] = [];
   public game: Game | null = null;
   public id: string;
-  public isPublic = false;
+  public isPublic = true;
   public allowWatchMode = true;
-
   private messenger = new Messenger(this);
 
   constructor() {
@@ -80,7 +79,7 @@ export class Room {
     }
 
     if (this.game) {
-      const isLastPlayer = this.playersInGame.length === 1;
+      const isLastPlayer = this.playersInGame.length <= 1;
 
       if (isLastPlayer) {
         this.game = null;
@@ -110,7 +109,7 @@ export class Room {
 
   public handlePlayerEvent(ws: WebSocket, { event, payload }: PlayerEvent) {
     const player = this.getPlayerByConnection(ws);
-    if (!player) return;
+    if (!player) throw new Error("Jogador não encontrado.");
 
     const gameEvents: (typeof event)[] = [
       "PLAYER_PLAY",
@@ -195,15 +194,23 @@ export class Room {
         this.messenger.sendRoomState();
         break;
       case "PLAYER_SET_ROOM_SETTINGS":
-        this.isPublic = payload.isPublic;
-        this.allowWatchMode = payload.allowWatchMode;
-        this.expansions = payload.expansions;
+        if (payload.expansions != undefined) {
+          this.expansions = payload.expansions;
+        }
 
-        if (!this.allowWatchMode) {
-          this.players.forEach((player) => {
-            player.isWatching = false;
-            player.isReady = false;
-          });
+        if (payload.isPublic != undefined) {
+          this.isPublic = Boolean(payload.isPublic);
+        }
+
+        if (payload.allowWatchMode != undefined) {
+          this.allowWatchMode = Boolean(payload.allowWatchMode);
+
+          if (payload.allowWatchMode) {
+            this.players.forEach((player) => {
+              player.isWatching = false;
+              player.isReady = false;
+            });
+          }
         }
 
         this.messenger.sendRoomState();
@@ -220,6 +227,9 @@ export class Room {
         this.disconnect(kickedClient.ws);
         kickedClient.ws.close();
         this.messenger.sendRoomState();
+        break;
+      case "PLAYER_REACT":
+        this.messenger.sendPlayerReact(payload.reaction);
         break;
       default:
         throw new Error("Evento não encontrado.");
@@ -250,7 +260,9 @@ export class Room {
   }
 
   public get playersInGame() {
-    return this.players.filter((player) => !player.isWatching);
+    return this.players.filter(
+      (player) => !player.isWatching && player.isConnected
+    );
   }
 
   public getPlayerByConnection(ws: WebSocket) {

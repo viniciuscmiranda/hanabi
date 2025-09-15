@@ -1,5 +1,3 @@
-import { Global } from "../global";
-
 const MALE_ANIMALS = [
   "Rato",
   "Hamster",
@@ -152,13 +150,5 @@ export function generatePlayerName() {
     ...(MALE_ANIMALS.includes(animal) ? MALE_ADJECTIVES : FEMALE_ADJECTIVES),
   ]);
 
-  const name = `${animal} ${adjective}`;
-
-  const playerNames = Global.clients.map((client) => client.player.name);
-
-  if (playerNames.includes(name)) {
-    return generatePlayerName();
-  }
-
-  return name;
+  return `${animal} ${adjective}`;
 }

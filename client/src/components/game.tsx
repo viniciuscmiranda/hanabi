@@ -1,17 +1,17 @@
 import { useMemo } from "react";
-import type { GameState } from "../../../core/types";
+
 import { Card } from "./card";
 import { Hand } from "./hand";
+import { Logs } from "./logs";
 import { Board } from "./board";
 import { Pause } from "./pause";
 import { GameOver } from "./game-over";
-import { DisconnectButton } from "./disconnect-button";
-import { Logs } from "./logs";
+
+import type { GameState } from "../../../core/types";
 
 type GameProps = {
   state: GameState;
   onReset: () => void;
-  onDisconnect: () => void;
   onPlayCard: (cardIndex: number) => void;
   onDiscardCard: (cardIndex: number) => void;
   onGiveTip: (
@@ -24,7 +24,6 @@ type GameProps = {
 export const Game = ({
   state,
   onReset,
-  onDisconnect,
   onPlayCard,
   onDiscardCard,
   onGiveTip,
@@ -45,10 +44,8 @@ export const Game = ({
   return (
     <main className="game">
       <Logs logs={state.logs} />
-      <DisconnectButton onDisconnect={onDisconnect} />
 
       {state.isGamePaused && !state.isGameFinished && <Pause />}
-      {state.isWatchMode && <span className="watch-mode">Modo espectador</span>}
       {state.isGameFinished && <GameOver onReset={onReset} state={state} />}
 
       <section className="players">
@@ -59,6 +56,7 @@ export const Game = ({
                 key={player.index}
                 isMe={state.isWatchMode ? index === 0 : player.isMe}
                 isCurrent={state.currentPlayerIndex === player.index}
+                isWatchMode={index === 0 && state.isWatchMode}
                 name={`${player.name} (${player.index + 1})`}
               >
                 {player.hand.map((card, index) => {

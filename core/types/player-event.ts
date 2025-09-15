@@ -44,7 +44,7 @@ type PlayerSetWatchModeEvent = {
 
 type PlayerSetRoomSettingsEvent = {
   event: Event.PLAYER_SET_ROOM_SETTINGS;
-  payload: RoomSettings;
+  payload: Partial<RoomSettings>;
 };
 
 type PlayerSetLeaderEvent = {
@@ -61,6 +61,13 @@ type PlayerKickPlayerEvent = {
   };
 };
 
+type PlayerReactEvent = {
+  event: Event.PLAYER_REACT;
+  payload: {
+    reaction: string;
+  };
+};
+
 export type PlayerEvent =
   | PlayerReadyEvent
   | PlayerPlayEvent
@@ -70,4 +77,5 @@ export type PlayerEvent =
   | PlayerSetWatchModeEvent
   | PlayerSetRoomSettingsEvent
   | PlayerSetLeaderEvent
-  | PlayerKickPlayerEvent;
+  | PlayerKickPlayerEvent
+  | PlayerReactEvent;

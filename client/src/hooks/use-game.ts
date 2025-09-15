@@ -7,16 +7,21 @@ import type {
   PlayerEvent,
   Card,
   RoomSettings,
+  Reaction,
 } from "../../../core/types";
 
 const TIMEOUT = 2000;
 const DELAY = 300;
+const REACTION_DURATION = 4500;
+const REACTION_INTERVAL = 1000;
 
 export function useGame(url?: string) {
   const ws = useRef<WebSocket>(null);
   const connectionDelay = useRef<NodeJS.Timeout>(null);
+  const reactionInterval = useRef<NodeJS.Timeout>(null);
   const [room, setRoom] = useState<RoomState>();
   const [game, setGame] = useState<GameState>();
+  const [reactions, setReactions] = useState<Reaction[]>([]);
 
   const [error, setError] = useState<string>();
   const [isConnecting, setIsConnecting] = useState(false);
@@ -30,6 +35,9 @@ export function useGame(url?: string) {
     setIsConnecting(false);
     setGame(undefined);
     setRoom(undefined);
+    setReactions([]);
+    if (reactionInterval.current) clearInterval(reactionInterval.current);
+    reactionInterval.current = null;
   }, []);
 
   const connect = useCallback(
@@ -85,6 +93,35 @@ export function useGame(url?: string) {
               break;
             case "ERROR":
               setError(payload.error);
+              break;
+            case "PLAYER_REACT":
+              setReactions((prev) => [
+                ...prev,
+                {
+                  key: Math.random().toString(36).substring(2, 15),
+                  emoji: payload.reaction,
+                  createdAt: Date.now(),
+                  position: Math.round(Math.random() * 100),
+                },
+              ]);
+
+              if (!reactionInterval.current) {
+                reactionInterval.current = setInterval(() => {
+                  setReactions((prev) => {
+                    const now = Date.now();
+                    const next = prev.filter(
+                      (reaction) => now - reaction.createdAt < REACTION_DURATION
+                    );
+
+                    if (next.length === 0 && reactionInterval.current) {
+                      clearInterval(reactionInterval.current);
+                      reactionInterval.current = null;
+                    }
+
+                    return next;
+                  });
+                }, REACTION_INTERVAL);
+              }
               break;
           }
         };
@@ -142,7 +179,7 @@ export function useGame(url?: string) {
   }, [send]);
 
   const setRoomSettings = useCallback(
-    (settings: RoomSettings) => {
+    (settings: Partial<RoomSettings>) => {
       send({ event: "PLAYER_SET_ROOM_SETTINGS", payload: settings });
     },
     [send]
@@ -169,9 +206,17 @@ export function useGame(url?: string) {
     [send]
   );
 
+  const react = useCallback(
+    (reaction: string) => {
+      send({ event: "PLAYER_REACT", payload: { reaction } });
+    },
+    [send]
+  );
+
   return {
     room,
     game,
+    reactions,
     error,
     isConnected,
     isConnecting,
@@ -181,6 +226,7 @@ export function useGame(url?: string) {
     setWatchMode,
     setLeader,
     kickPlayer,
+    react,
     playCard,
     discardCard,
     giveTip,

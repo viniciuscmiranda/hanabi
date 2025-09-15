@@ -6,6 +6,8 @@ import { Room } from "./components/room";
 import { Loading } from "./components/loading";
 import { Game } from "./components/game";
 import { Setup } from "./components/setup";
+import { Reactions } from "./components/reactions";
+import { DisconnectButton } from "./components/disconnect-button";
 
 function setURL(url: string) {
   window.history.replaceState(
@@ -25,6 +27,7 @@ export function App() {
     setWatchMode,
     setLeader,
     kickPlayer,
+    react,
     playCard,
     discardCard,
     giveTip,
@@ -36,6 +39,7 @@ export function App() {
     isConnected,
     isConnecting,
     error,
+    reactions,
   } = useGame(url);
 
   useEffect(() => {
@@ -67,29 +71,39 @@ export function App() {
     return <Loading message="Carreganda sala" />;
   }
 
-  if (!game) {
+  function render() {
+    if (!room) return null;
+
+    if (!game) {
+      return (
+        <Room
+          state={room}
+          onReady={makePlayerReady}
+          onRename={renamePlayer}
+          onSetRoomSettings={setRoomSettings}
+          onSetWatchMode={setWatchMode}
+          onSetLeader={setLeader}
+          onKickPlayer={kickPlayer}
+        />
+      );
+    }
+
     return (
-      <Room
-        state={room}
-        onReady={makePlayerReady}
-        onRename={renamePlayer}
-        onDisconnect={disconnect}
-        onSetRoomSettings={setRoomSettings}
-        onSetWatchMode={setWatchMode}
-        onSetLeader={setLeader}
-        onKickPlayer={kickPlayer}
+      <Game
+        state={game}
+        onPlayCard={playCard}
+        onDiscardCard={discardCard}
+        onGiveTip={giveTip}
+        onReset={reset}
       />
     );
   }
 
   return (
-    <Game
-      state={game}
-      onPlayCard={playCard}
-      onDiscardCard={discardCard}
-      onGiveTip={giveTip}
-      onReset={reset}
-      onDisconnect={disconnect}
-    />
+    <>
+      <Reactions reactions={reactions} onReact={react} />
+      <DisconnectButton onDisconnect={disconnect} />
+      {render()}
+    </>
   );
 }

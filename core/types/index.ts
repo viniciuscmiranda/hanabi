@@ -7,3 +7,4 @@ export * from "./room-settings";
 export * from "./card";
 export * from "./expansion";
 export * from "./log";
+export * from "./reaction";

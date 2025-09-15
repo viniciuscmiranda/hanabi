@@ -12,9 +12,20 @@ type GameUpdateEvent = {
   payload: GameState;
 };
 
+type PlayerReactEvent = {
+  event: Event.PLAYER_REACT;
+  payload: {
+    reaction: string;
+  };
+};
+
 type ErrorEvent = {
   event: Event.ERROR;
   payload: { error: string };
 };
 
-export type GameEvent = RoomUpdateEvent | GameUpdateEvent | ErrorEvent;
+export type GameEvent =
+  | RoomUpdateEvent
+  | GameUpdateEvent
+  | ErrorEvent
+  | PlayerReactEvent;
