@@ -1,14 +1,14 @@
+import { config } from "dotenv";
+config({ path: "../.env" });
+
 import * as http from "node:http";
 import { WebSocketServer } from "ws";
-import { config } from "dotenv";
 
 import { Room } from "./game/room";
 import { validateMessage } from "./utils/validate-message";
 
 import type { Room as RoomType } from "../core/types";
 import { Messenger } from "./utils/messenger";
-
-config({ path: "../.env" });
 
 const wss = new WebSocketServer({ port: 8080 });
 const rooms = new Map<string, Room>();
