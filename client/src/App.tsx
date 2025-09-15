@@ -13,7 +13,7 @@ function setURL(url: string) {
   window.history.replaceState(
     {},
     "",
-    `${window.location.pathname}?server=${url}`
+    `${window.location.pathname}${url ? `?server=${url}` : ""}`
   );
 }
 
@@ -58,7 +58,7 @@ export function App() {
     return (
       <Setup
         error={error}
-        initialURL={url}
+        initialServerURL={url}
         onConnect={(url) => {
           connect(url);
           setURL(url);
@@ -102,7 +102,12 @@ export function App() {
   return (
     <>
       <Reactions reactions={reactions} onReact={react} />
-      <DisconnectButton onDisconnect={disconnect} />
+      <DisconnectButton
+        onDisconnect={() => {
+          disconnect();
+          setURL("");
+        }}
+      />
       {render()}
     </>
   );

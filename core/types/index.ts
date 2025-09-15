@@ -8,3 +8,4 @@ export * from "./card";
 export * from "./expansion";
 export * from "./log";
 export * from "./reaction";
+export * from "./room";

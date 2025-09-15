@@ -44,6 +44,7 @@ export class Room {
     if (!this.leader) this.leader = player;
 
     if (this.game && !disconnectedClient) {
+      if (!this.allowWatchMode) throw new Error("O jogo já começou.");
       player.isWatching = true;
       this.clients.push({ ws, player });
       this.messenger.sendRoomState();
@@ -224,6 +225,11 @@ export class Room {
       case "PLAYER_KICK_PLAYER":
         const kickedClient = this.connectedClients.at(payload.playerIndex);
         if (!kickedClient?.ws) throw new Error("Jogador não encontrado.");
+        this.messenger.sendError(
+          new Error("Você foi removido da sala."),
+          kickedClient.ws
+        );
+
         this.disconnect(kickedClient.ws);
         kickedClient.ws.close();
         this.messenger.sendRoomState();

@@ -1,8 +1,11 @@
 import { WebSocketServer } from "ws";
+import * as http from "node:http";
 
 import { Room } from "./game/room";
-import type { GameEvent, PlayerEvent } from "../core/types";
 import { validateMessage } from "./utils/validate-message";
+
+import type { Room as RoomType } from "../core/types";
+import { Messenger } from "./utils/messenger";
 
 const wss = new WebSocketServer({ port: 8080 });
 const rooms = new Map<string, Room>();
@@ -15,15 +18,6 @@ function log(context: string, message: string) {
   });
 
   console.log(`${timestamp} - [${context}] ${message}`);
-}
-
-function formatError(error: Error) {
-  const message: GameEvent = {
-    event: "ERROR",
-    payload: { error: error.message },
-  };
-
-  return JSON.stringify(message);
 }
 
 wss.on("connection", (ws, request) => {
@@ -43,7 +37,7 @@ wss.on("connection", (ws, request) => {
     const player = room.connect(ws);
     log(room.id, `${player.name} connected`);
   } catch (error) {
-    ws.send(formatError(error));
+    Messenger.sendError(error, ws);
     ws.close();
     return;
   }
@@ -53,7 +47,7 @@ wss.on("connection", (ws, request) => {
       const data = validateMessage(JSON.parse(raw.toString()));
       room.handlePlayerEvent(ws, data);
     } catch (error) {
-      ws.send(formatError(error));
+      Messenger.sendError(error, ws);
       ws.close();
     }
   });
@@ -68,4 +62,37 @@ wss.on("connection", (ws, request) => {
   });
 });
 
-log("server", "Server is running on port 8080");
+http
+  .createServer((req, res) => {
+    const headers = {
+      "Content-Type": "application/json",
+      // TODO: move to env
+      "Access-Control-Allow-Origin": "*",
+    };
+
+    if (req.url === "/rooms") {
+      res.writeHead(200, headers);
+
+      const publicRooms = Array.from(rooms.values()).filter(
+        (room) => room.isPublic
+      );
+
+      const data = publicRooms.map<RoomType>((room) => ({
+        id: room.id,
+        players: room.players.length,
+        isGameStarted: room.game !== null,
+        allowWatchMode: room.allowWatchMode,
+        expansions: room.expansions,
+      }));
+
+      res.end(JSON.stringify(data));
+      return;
+    }
+
+    res.writeHead(404, headers);
+    res.end(JSON.stringify({ error: "Not found" }));
+  })
+  .listen(3000);
+
+log("WS", "Server is running on port 8080");
+log("HTTP", "Server is running on port 3000");

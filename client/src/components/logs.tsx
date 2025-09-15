@@ -20,7 +20,7 @@ export const Logs = ({ logs }: LogsProps) => {
     <>
       <button className="logs-button">Histórico</button>
       <div className="logs">
-        <div>
+        <div className="scroll-bar">
           <label>
             <input
               type="checkbox"

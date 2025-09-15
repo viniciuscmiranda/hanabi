@@ -9,6 +9,22 @@ import type { GameEvent } from "../../core/types";
 export class Messenger {
   constructor(private room: Room) {}
 
+  public static sendError(error: Error, ws: WebSocket) {
+    const message: GameEvent = {
+      event: "ERROR",
+      payload: { error: error.message },
+    };
+
+    ws.send(JSON.stringify(message));
+  }
+
+  public sendError(error: Error, ws?: WebSocket) {
+    this.room.clients.forEach((client) => {
+      if (!client.ws || (ws && client.ws !== ws)) return;
+      Messenger.sendError(error, client.ws);
+    });
+  }
+
   private send(event: (player: Player) => GameEvent, ws?: WebSocket) {
     this.room.clients.forEach((client) => {
       if (ws && client.ws !== ws) return;

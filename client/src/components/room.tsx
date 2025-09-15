@@ -98,7 +98,7 @@ export const Room = ({
           </div>
         </div>
 
-        <div>
+        <div className="players-list scroll-bar">
           <h4>Jogadores</h4>
           <ul>
             {state.players.map((player, index) => (
@@ -168,7 +168,7 @@ export const Room = ({
               }, 2000);
             }}
           >
-            {isCopied ? "Copiado!" : "Convidar"}
+            🔗 {isCopied ? "Copiado!" : "Copiar link da sala"} ({state.roomId})
           </button>
         </footer>
       </section>
