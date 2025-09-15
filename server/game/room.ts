@@ -83,6 +83,16 @@ export class Room {
       const isLastPlayer = this.playersInGame.length <= 1;
 
       if (isLastPlayer) {
+        this.clients.forEach((client) => {
+          if (!client.ws) return;
+          this.messenger.sendError(
+            new Error("Os jogadores abandonaram a sala."),
+            client.ws
+          );
+
+          client.ws.close();
+        });
+
         this.game = null;
         this.clients = [];
       } else {
@@ -190,8 +200,13 @@ export class Room {
         if (!this.allowWatchMode) {
           throw new Error("O modo espectador não está permitido.");
         }
+
         player.isWatching = payload.isWatchMode;
-        player.isReady = false;
+
+        this.players.forEach((player) => {
+          player.isReady = false;
+        });
+
         this.messenger.sendRoomState();
         break;
       case "PLAYER_SET_ROOM_SETTINGS":

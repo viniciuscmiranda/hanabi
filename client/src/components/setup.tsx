@@ -8,10 +8,12 @@ type SetupProps = {
   onConnect: (url: string) => void;
 };
 
-// TODO: move to env
-const HTTP_SERVER_URL = "http://localhost:3000";
-const WS_SERVER_URL = "ws://localhost:8080";
+const HTTP_SERVER_URL =
+  import.meta.env.VITE_HTTP_SERVER_URL || "http://localhost:3000";
+const WS_SERVER_URL =
+  import.meta.env.VITE_WS_SERVER_URL || "ws://localhost:8080";
 
+console.log(import.meta.env);
 export const Setup = ({ error, onConnect, initialServerURL }: SetupProps) => {
   const serverURL = initialServerURL || WS_SERVER_URL;
   const [rooms, setRooms] = useState<Room[]>([]);

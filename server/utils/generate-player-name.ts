@@ -142,13 +142,21 @@ function random<T>(array: T[]) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+const DISABLE_ADJECTIVES = process.env.SERVER_DISABLE_ADJECTIVES === "true";
+
 export function generatePlayerName() {
   const animal = random([...MALE_ANIMALS, ...FEMALE_ANIMALS]);
 
-  const adjective = random([
-    ...NEUTRAL_ADJECTIVES,
-    ...(MALE_ANIMALS.includes(animal) ? MALE_ADJECTIVES : FEMALE_ADJECTIVES),
-  ]);
+  const adjective = DISABLE_ADJECTIVES
+    ? ""
+    : " ".concat(
+        random([
+          ...NEUTRAL_ADJECTIVES,
+          ...(MALE_ANIMALS.includes(animal)
+            ? MALE_ADJECTIVES
+            : FEMALE_ADJECTIVES),
+        ])
+      );
 
-  return `${animal} ${adjective}`;
+  return `${animal}${adjective}`;
 }

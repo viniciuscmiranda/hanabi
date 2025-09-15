@@ -1,11 +1,14 @@
-import { WebSocketServer } from "ws";
 import * as http from "node:http";
+import { WebSocketServer } from "ws";
+import { config } from "dotenv";
 
 import { Room } from "./game/room";
 import { validateMessage } from "./utils/validate-message";
 
 import type { Room as RoomType } from "../core/types";
 import { Messenger } from "./utils/messenger";
+
+config({ path: "../.env" });
 
 const wss = new WebSocketServer({ port: 8080 });
 const rooms = new Map<string, Room>();
@@ -19,6 +22,8 @@ function log(context: string, message: string) {
 
   console.log(`${timestamp} - [${context}] ${message}`);
 }
+
+const TIMEOUT = Number(process.env.SERVER_WS_CLIENT_TIMEOUT) || 1000 * 60 * 5;
 
 wss.on("connection", (ws, request) => {
   const room = (() => {
@@ -42,10 +47,23 @@ wss.on("connection", (ws, request) => {
     return;
   }
 
+  function initTimeout() {
+    return setTimeout(() => {
+      Messenger.sendError(new Error("Desconectado por inatividade."), ws);
+
+      ws.close();
+    }, TIMEOUT);
+  }
+
+  let timeout = initTimeout();
+
   ws.on("message", (raw) => {
     try {
       const data = validateMessage(JSON.parse(raw.toString()));
       room.handlePlayerEvent(ws, data);
+
+      clearTimeout(timeout);
+      timeout = initTimeout();
     } catch (error) {
       Messenger.sendError(error, ws);
       ws.close();
@@ -53,6 +71,8 @@ wss.on("connection", (ws, request) => {
   });
 
   ws.on("close", () => {
+    clearTimeout(timeout);
+
     const player = room.disconnect(ws);
     if (player) log(room.id, `${player.name} disconnected`);
     if (room.clients.length === 0) {
@@ -66,8 +86,7 @@ http
   .createServer((req, res) => {
     const headers = {
       "Content-Type": "application/json",
-      // TODO: move to env
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": process.env.SERVER_ALLOWED_ORIGINS,
     };
 
     if (req.url === "/rooms") {
