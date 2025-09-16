@@ -50,7 +50,6 @@ wss.on("connection", (ws, request) => {
   function initTimeout() {
     return setTimeout(() => {
       Messenger.sendError(new Error("Desconectado por inatividade."), ws);
-
       ws.close();
     }, TIMEOUT);
   }
@@ -98,10 +97,18 @@ http
 
       const data = publicRooms.map<RoomType>((room) => ({
         id: room.id,
-        players: room.players.length,
-        isGameStarted: room.game !== null,
+        players: room.clients.filter((client) => client.ws).length,
         allowWatchMode: room.allowWatchMode,
         expansions: room.expansions,
+        game: room.game && {
+          score: room.game.board.score,
+          deckSize: room.game.deck.amountOfCards,
+          lives: room.game.lives,
+          turnNumber: room.game.turnNumber,
+          roundNumber: room.game.roundNumber,
+          tips: room.game.tips,
+          isGamePaused: room.game.isGamePaused,
+        },
       }));
 
       res.end(JSON.stringify(data));

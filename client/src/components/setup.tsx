@@ -67,7 +67,13 @@ export const Setup = ({ error, onConnect, initialServerURL }: SetupProps) => {
                 <li key={room.id}>
                   <a href={`${url.origin}?server=${server.origin}/${room.id}`}>
                     <span>
-                      {room.id} {room.isGameStarted && "🃏"}
+                      {room.id}{" "}
+                      {room.game &&
+                        (room.game.isGamePaused ? (
+                          <span title="Jogo pausado">⏸️</span>
+                        ) : (
+                          <span title="Jogo em andamento">▶️</span>
+                        ))}
                     </span>
 
                     <div className="room-info">

@@ -17,11 +17,11 @@ type Client = {
 };
 
 export class Room {
+  public id: string;
   public clients: Client[] = [];
   public leader: Player | null = null;
   public expansions: Expansion[] = [];
   public game: Game | null = null;
-  public id: string;
   public isPublic = true;
   public allowWatchMode = true;
   private messenger = new Messenger(this);
@@ -221,7 +221,7 @@ export class Room {
         if (payload.allowWatchMode != undefined) {
           this.allowWatchMode = Boolean(payload.allowWatchMode);
 
-          if (payload.allowWatchMode) {
+          if (!payload.allowWatchMode) {
             this.players.forEach((player) => {
               player.isWatching = false;
               player.isReady = false;

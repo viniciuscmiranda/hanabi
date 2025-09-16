@@ -208,7 +208,7 @@ export class Game {
   private throwIfPlayerCannotPlay(player: Player) {
     if (this.isGamePaused) throw new Error("O jogo está pausado.");
     if (this.currentPlayer !== player)
-      throw new Error(`É o turno de${this.currentPlayer.name}.`);
+      throw new Error(`É o turno de ${this.currentPlayer.name}.`);
     return true;
   }
 
