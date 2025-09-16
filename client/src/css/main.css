@@ -437,6 +437,7 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  text-align: center;
 
   ul {
     margin-top: 1rem;
@@ -586,8 +587,8 @@ body {
           border-radius: 0.5rem;
           padding: 0.5rem 1rem;
 
-          &:hover > span {
-            text-decoration: underline;
+          &:hover {
+            opacity: 0.8;
           }
 
           .room-info {
@@ -753,6 +754,7 @@ body {
     flex-direction: column-reverse;
     gap: 0.5rem;
     z-index: 2000;
+    height: max-content;
 
     li {
       --index: attr(data-index type(<number>));
@@ -763,8 +765,7 @@ body {
 
       &:not(:first-child) {
         opacity: 0;
-        transform: translateY(calc(4.5rem * var(--index))) scale(0.2)
-          rotate(180deg);
+        transform: translateY(calc(4.5rem * var(--index))) scale(0.2);
         transition-property: opacity, transform;
         transition: 0.25s ease;
       }
@@ -809,8 +810,9 @@ body {
       --position: attr(data-position type(<number>));
 
       position: absolute;
-      left: clamp(6rem, calc(var(--position) * 1%), calc(100% - 6rem));
-      bottom: -6rem;
+      transform: translateX(-50%);
+      left: min(calc(var(--position) * 1%), calc(100% - 6rem));
+      bottom: calc(-6rem - 0.01rem * var(--position));
       font-size: 6rem;
       animation: reaction-float 4s ease-in-out forwards,
         reaction-fade 3.5s ease forwards;
