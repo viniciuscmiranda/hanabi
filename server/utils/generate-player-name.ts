@@ -142,9 +142,9 @@ function random<T>(array: T[]) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-const DISABLE_ADJECTIVES = process.env.SERVER_DISABLE_ADJECTIVES === "true";
-
 export function generatePlayerName() {
+  const DISABLE_ADJECTIVES = process.env.SERVER_DISABLE_ADJECTIVES === "true";
+
   const animal = random([...MALE_ANIMALS, ...FEMALE_ANIMALS]);
 
   const adjective = DISABLE_ADJECTIVES
