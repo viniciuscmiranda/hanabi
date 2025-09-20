@@ -93,7 +93,10 @@ export class Game {
       this.endTurn();
     }
 
-    return cardsToReveal.map((card) => selectedPlayer.hand.indexOf(card));
+    return cardsToReveal.map((card) => ({
+      index: selectedPlayer.hand.indexOf(card),
+      card,
+    }));
   }
 
   public playCard(player: Player, cardIndex: number) {

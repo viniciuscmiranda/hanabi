@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Card } from "./card";
 import { Format } from "../utils/format";
+import { isMobile } from "../utils/is-mobile";
 
 import type { GameState } from "../../../core/types";
 
@@ -23,11 +24,18 @@ ${state.board.map((pile) => `${Format.card(pile[0])}`).join("\n")}
 
 ${window.location.origin}`;
 
-    navigator.clipboard.writeText(text);
-    setIsCopied(true);
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2000);
+    if (isMobile()) {
+      navigator.share({
+        title: "🎆 花火 - Hanabi",
+        text: text,
+      });
+    } else {
+      navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    }
   }
 
   return (

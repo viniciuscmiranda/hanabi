@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import type { Expansion, RoomSettings, RoomState } from "../../../core/types";
+import { isMobile } from "../utils/is-mobile";
 
 type RoomProps = {
   state: RoomState;
@@ -161,14 +162,22 @@ export const Room = ({
             className="share-button"
             disabled={isCopied}
             onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              setIsCopied(true);
-              setTimeout(() => {
-                setIsCopied(false);
-              }, 2000);
+              const text = window.location.href;
+
+              if (isMobile()) {
+                navigator.share({ text: text });
+              } else {
+                navigator.clipboard.writeText(text);
+
+                setIsCopied(true);
+                setTimeout(() => {
+                  setIsCopied(false);
+                }, 2000);
+              }
             }}
           >
-            🔗 {isCopied ? "Copiado!" : "Copiar link da sala"} ({state.roomId})
+            🔗 {isCopied ? "Copiado!" : "Compartilhar link da sala"} (
+            {state.roomId})
           </button>
         </footer>
       </section>

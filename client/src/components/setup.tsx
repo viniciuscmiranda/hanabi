@@ -64,7 +64,7 @@ export const Setup = ({ error, onConnect, initialServerURL }: SetupProps) => {
 
               return (
                 <li key={room.id}>
-                  <a href={`${url.origin}?server=${server.origin}/${room.id}`}>
+                  <a href={`${url.href}?server=${server.origin}/${room.id}`}>
                     <span>
                       {room.id}{" "}
                       {room.game &&

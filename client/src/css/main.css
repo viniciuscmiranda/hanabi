@@ -422,6 +422,10 @@ body {
     }
   }
 
+  &.animation-give-tip .card {
+    animation: animation-give-tip 450ms ease;
+  }
+
   .card-container-inner:hover {
     .card:enable {
       cursor: pointer;
@@ -431,6 +435,25 @@ body {
     & ~ .options {
       display: block;
     }
+  }
+}
+
+@keyframes animation-give-tip {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(0deg);
+    scale: 1.1;
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(0deg);
   }
 }
 
@@ -490,10 +513,6 @@ body {
 
   &.animation-play {
     animation-name: animation-play;
-  }
-
-  &.animation-give-tip .card {
-    /* TODO: add animation */
   }
 
   &.animation-draw {
@@ -665,7 +684,6 @@ body {
     display: flex;
     list-style: none;
     padding: 0;
-    gap: 0.5rem;
   }
 
   &:has(span:hover) {
@@ -1149,6 +1167,14 @@ body {
     font-size: 1.75rem;
   }
 
+  .card-container-animating {
+    animation-delay: 300ms !important;
+  }
+
+  .card-draw-slot {
+    animation-delay: 300ms !important;
+  }
+
   .card-container-clone {
     &.animation-discard {
       animation: animation-discard forwards var(--animation-time)
@@ -1245,11 +1271,11 @@ body {
 
   .info {
     font-size: 1.35rem;
-    gap: 0.5rem;
+    gap: 0.25rem;
     flex-wrap: wrap;
     justify-content: center;
     span {
-      width: 3.2rem;
+      width: 3.5rem;
     }
   }
 

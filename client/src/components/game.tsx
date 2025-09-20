@@ -48,27 +48,43 @@ export const Game = ({
     cardIndex: number
   ): Partial<React.ComponentProps<typeof Card>> {
     if (!event) return {};
-    if (playerIndex !== event.payload.playerIndex) return {};
-    if (cardIndex !== event.payload.cardIndex) return {};
 
     switch (event.event) {
-      case "PLAYER_PLAY":
+      case "PLAYER_PLAY": {
+        const data = event.payload;
+        if (playerIndex !== data.playerIndex) return {};
+        if (cardIndex !== data.cardIndex) return {};
+
         return {
           animation: event.payload.success ? "play" : "discard",
           backCard: event.payload.card,
           drawnCard: event.payload.drawnCard,
         };
-      case "PLAYER_DISCARD":
+      }
+      case "PLAYER_DISCARD": {
+        const data = event.payload;
+        if (playerIndex !== data.playerIndex) return {};
+        if (cardIndex !== data.cardIndex) return {};
+
         return {
           animation: "discard",
           backCard: event.payload.card,
           drawnCard: event.payload.drawnCard,
         };
-      case "PLAYER_GIVE_TIP":
-        // TODO: get other cards that have being revealed
+      }
+      case "PLAYER_GIVE_TIP": {
+        const data = event.payload;
+        if (playerIndex !== data.selectedPlayerIndex) return {};
+        const card = data.cards.find((card) => card.index === cardIndex);
+        if (!card) return {};
+
         return {
           animation: "give-tip",
+          isColorRevealed: card.isColorRevealed,
+          isValueRevealed: card.isValueRevealed,
+          card: card,
         };
+      }
     }
   }
 
@@ -121,14 +137,14 @@ export const Game = ({
                   return (
                     <Card
                       key={cardIndex}
-                      {...getAnimationProps(player.index, cardIndex)}
                       card={card}
+                      isValueRevealed={card.isValueRevealed}
+                      isColorRevealed={card.isColorRevealed}
+                      {...getAnimationProps(player.index, cardIndex)}
                       anchorTop={player.isMe}
                       isMe={player.isMe}
                       options={player.isMe ? myHandOptions : otherHandOptions}
                       showTips={!player.isMe && !state.isGameFinished}
-                      isValueRevealed={card.isValueRevealed}
-                      isColorRevealed={card.isColorRevealed}
                       deckSize={state.deckSize}
                       disabled={
                         Boolean(event) ||

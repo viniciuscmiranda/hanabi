@@ -182,7 +182,7 @@ export class Room {
         const selectedPlayer = this.playersInGame.at(payload.playerIndex);
         if (!selectedPlayer) throw new Error("Jogador não encontrado.");
 
-        const cardIndexes = this.game!.giveTip(
+        const cards = this.game!.giveTip(
           player,
           selectedPlayer,
           payload.cardIndex,
@@ -193,7 +193,7 @@ export class Room {
           this.playersInGame.indexOf(player),
           payload.playerIndex,
           payload.cardIndex,
-          cardIndexes,
+          cards,
           payload.info
         );
 

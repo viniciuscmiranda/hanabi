@@ -109,9 +109,11 @@ export function useGame(url?: string) {
                 { event: data, timestamp: Date.now() },
               ]);
               break;
-            // TODO: remove this
             case "PLAYER_GIVE_TIP":
-              setGame(payload.gameState);
+              setEvents((prev) => [
+                ...prev,
+                { event: data, timestamp: Date.now() - 400 },
+              ]);
               break;
             case "ERROR":
               setError(payload.error);

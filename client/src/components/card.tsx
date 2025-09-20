@@ -54,11 +54,7 @@ export const Card = ({
       portal.removeChild(lastDrawEl);
 
     if (!cardContainerRef.current || !animation) return;
-
-    if (animation === "give-tip") {
-      // TODO: add give tip animation
-      return;
-    }
+    if (animation === "give-tip") return;
 
     const cardContainerRt = cardContainerRef.current.getBoundingClientRect();
 
@@ -125,8 +121,6 @@ export const Card = ({
       } else if (boardSlotEl) {
         const boardSlotRt = boardSlotEl.getBoundingClientRect();
 
-        console.log(boardSlotEl);
-        console.log(boardSlotRt);
         playY = Math.round(boardSlotRt.y - cardContainerRt.y);
         playX = Math.round(
           boardSlotRt.x - cardContainerRt.x - cardContainerRt.width / 2 + 4
@@ -198,7 +192,10 @@ export const Card = ({
       ref={cardContainerRef}
       className={(() => {
         const classes = [];
-        if (animation && animation !== "give-tip") {
+
+        if (animation === "give-tip") {
+          classes.push("animation-give-tip");
+        } else if (animation) {
           classes.push("card-container-animating");
           if (deckSize > 0) classes.push("card-can-draw");
           if (isMe && (!card.isValueRevealed || !card.isColorRevealed)) {

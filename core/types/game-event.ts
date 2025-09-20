@@ -1,4 +1,4 @@
-import type { GameState } from "./game-state";
+import type { GameState, Me, OtherPlayer } from "./game-state";
 import type { RoomState } from "./room-state";
 import type { Event } from "./event";
 import type { Card } from "./card";
@@ -49,7 +49,7 @@ type PlayerGiveTipEvent = {
     playerIndex: number;
     selectedPlayerIndex: number;
     cardIndex: number;
-    cardIndexes: number[];
+    cards: ({ index: number } & (Me | OtherPlayer)["hand"][number])[];
     info: Card.INFO;
     gameState: GameState;
   };

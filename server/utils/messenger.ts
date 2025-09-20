@@ -122,19 +122,31 @@ export class Messenger {
     playerIndex: number,
     selectedPlayerIndex: number,
     cardIndex: number,
-    cardIndexes: number[],
+    cards: { index: number; card: Card }[],
     info: Card.INFO,
     ws?: WebSocket
   ) {
     this.send(
-      (player) => ({
+      (player, pIndex) => ({
         event: "PLAYER_GIVE_TIP",
         payload: {
           gameState: this.getGameState(player),
           playerIndex,
           selectedPlayerIndex,
           cardIndex,
-          cardIndexes,
+          cards: cards.map(({ index, card }) => ({
+            index: index,
+            value:
+              selectedPlayerIndex !== pIndex || card.isValueRevealed
+                ? card.value
+                : null,
+            color:
+              selectedPlayerIndex !== pIndex || card.isColorRevealed
+                ? card.color
+                : null,
+            isValueRevealed: card.isValueRevealed,
+            isColorRevealed: card.isColorRevealed,
+          })),
           info,
         },
       }),
