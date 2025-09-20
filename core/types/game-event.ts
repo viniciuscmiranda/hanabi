@@ -1,6 +1,7 @@
 import type { GameState } from "./game-state";
 import type { RoomState } from "./room-state";
 import type { Event } from "./event";
+import type { Card } from "./card";
 
 type RoomUpdateEvent = {
   event: Event.ROOM_UPDATE;
@@ -19,13 +20,58 @@ type PlayerReactEvent = {
   };
 };
 
+type PlayerPlayEvent = {
+  event: Event.PLAYER_PLAY;
+  payload: {
+    success: boolean;
+    playerIndex: number;
+    cardIndex: number;
+    card: Card;
+    drawnCard?: Card;
+    gameState: GameState;
+  };
+};
+
+type PlayerDiscardEvent = {
+  event: Event.PLAYER_DISCARD;
+  payload: {
+    playerIndex: number;
+    cardIndex: number;
+    card: Card;
+    drawnCard?: Card;
+    gameState: GameState;
+  };
+};
+
+type PlayerGiveTipEvent = {
+  event: Event.PLAYER_GIVE_TIP;
+  payload: {
+    playerIndex: number;
+    selectedPlayerIndex: number;
+    cardIndex: number;
+    cardIndexes: number[];
+    info: Card.INFO;
+    gameState: GameState;
+  };
+};
+
 type ErrorEvent = {
   event: Event.ERROR;
-  payload: { error: string };
+  payload: {
+    error: string;
+  };
 };
+
+export type PlayerActionGameEvent =
+  | PlayerPlayEvent
+  | PlayerDiscardEvent
+  | PlayerGiveTipEvent;
 
 export type GameEvent =
   | RoomUpdateEvent
   | GameUpdateEvent
   | ErrorEvent
-  | PlayerReactEvent;
+  | PlayerReactEvent
+  | PlayerPlayEvent
+  | PlayerDiscardEvent
+  | PlayerGiveTipEvent;

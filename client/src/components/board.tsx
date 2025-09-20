@@ -31,23 +31,34 @@ export const Board = ({ state }: BoardProps) => {
             <span title="Vidas">❤️ {state.lives}</span>
             <span title="Pontuação">🏆 {state.score}</span>
             <span title="Rodada">🔄 {state.roundNumber}</span>
-            <span title="Baralho">🃏 {state.deckSize}</span>
+            <span title="Baralho" id="deck">
+              🃏 {state.deckSize}
+            </span>
           </section>
 
-          {!state.board.length && <i>Nada</i>}
+          {!state.board.length && <i className="board-empty">Nada</i>}
 
-          <ul>
+          <ul id="board">
             {state.board.map((pile, index) => (
               <Card key={index} card={pile[0]} disabled />
             ))}
+            <span
+              key={state.board.length}
+              className="board-play-slot"
+              id="board-play-slot"
+            />
           </ul>
         </section>
 
-        <section className="discard" onClick={() => setShowDiscardModal(true)}>
+        <section
+          id="discard-pile"
+          className="discard"
+          onClick={() => setShowDiscardModal(true)}
+        >
           <section className="info">
             <span title="Descarte">🗑️ {state.discardPile.length}</span>
           </section>
-          {!state.discardPile.length && <i>Nada</i>}
+          {!state.discardPile.length && <i className="discard-empty">Nada</i>}
           <ul>
             {Object.values(discardPile).length > 0 && (
               <Card card={state.discardPile.at(-1)!} disabled={false} />

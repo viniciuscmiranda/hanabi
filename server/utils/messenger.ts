@@ -25,10 +25,13 @@ export class Messenger {
     });
   }
 
-  private send(event: (player: Player) => GameEvent, ws?: WebSocket) {
-    this.room.clients.forEach((client) => {
+  private send(
+    event: (player: Player, clientIndex: number) => GameEvent,
+    ws?: WebSocket
+  ) {
+    this.room.clients.forEach((client, clientIndex) => {
       if (ws && client.ws !== ws) return;
-      const data = event(client.player);
+      const data = event(client.player, clientIndex);
       client.ws?.send(JSON.stringify(data));
     });
   }
@@ -38,6 +41,102 @@ export class Messenger {
       () => ({
         event: "PLAYER_REACT",
         payload: { reaction },
+      }),
+      ws
+    );
+  }
+
+  public sendPlayerPlay(
+    playerIndex: number,
+    cardIndex: number,
+    success: boolean,
+    card: Card,
+    drawnCard?: Card,
+    ws?: WebSocket
+  ) {
+    this.send(
+      (player, index) => ({
+        event: "PLAYER_PLAY",
+        payload: {
+          gameState: this.getGameState(player),
+          playerIndex,
+          cardIndex,
+          success,
+          card: {
+            value: card.value,
+            color: card.color,
+            isValueRevealed: card.isValueRevealed,
+            isColorRevealed: card.isColorRevealed,
+          },
+          drawnCard:
+            playerIndex !== index && drawnCard
+              ? {
+                  value: drawnCard.value,
+                  color: drawnCard.color,
+                  isValueRevealed: drawnCard.isValueRevealed,
+                  isColorRevealed: drawnCard.isColorRevealed,
+                }
+              : undefined,
+        },
+      }),
+      ws
+    );
+  }
+
+  public sendPlayerDiscard(
+    playerIndex: number,
+    cardIndex: number,
+    card: Card,
+    drawnCard?: Card,
+    ws?: WebSocket
+  ) {
+    this.send(
+      (player, index) => ({
+        event: "PLAYER_DISCARD",
+        payload: {
+          gameState: this.getGameState(player),
+          playerIndex,
+          cardIndex,
+          drawnCard:
+            playerIndex !== index && drawnCard
+              ? {
+                  value: drawnCard.value,
+                  color: drawnCard.color,
+                  isValueRevealed: drawnCard.isValueRevealed,
+                  isColorRevealed: drawnCard.isColorRevealed,
+                }
+              : undefined,
+          card: {
+            value: card.value,
+            color: card.color,
+            isValueRevealed: card.isValueRevealed,
+            isColorRevealed: card.isColorRevealed,
+          },
+        },
+      }),
+      ws
+    );
+  }
+
+  public sendPlayerGiveTip(
+    playerIndex: number,
+    selectedPlayerIndex: number,
+    cardIndex: number,
+    cardIndexes: number[],
+    info: Card.INFO,
+    ws?: WebSocket
+  ) {
+    this.send(
+      (player) => ({
+        event: "PLAYER_GIVE_TIP",
+        payload: {
+          gameState: this.getGameState(player),
+          playerIndex,
+          selectedPlayerIndex,
+          cardIndex,
+          cardIndexes,
+          info,
+        },
       }),
       ws
     );
@@ -68,51 +167,56 @@ export class Messenger {
   }
 
   public sendGameState(ws?: WebSocket) {
-    this.send((player) => {
-      if (!this.room.game) throw new Error("O jogo ainda não começou.");
-
-      return {
+    this.send(
+      (player) => ({
         event: "GAME_UPDATE",
-        payload: {
-          isWatchMode: player.isWatching,
-          roomId: this.room.id,
-          tips: this.room.game.tips,
-          lives: this.room.game.lives,
-          deckSize: this.room.game.deck.amountOfCards,
-          score: this.room.game.board.score,
-          turnNumber: this.room.game.turnNumber,
-          roundNumber: this.room.game.roundNumber,
-          currentPlayerIndex: this.room.game.currentPlayerIndex,
-          isGameFinished: this.room.game.isGameFinished,
-          isGamePaused: this.room.game.isGamePaused,
-          expansions: this.room.game.board.expansions,
-          discardPile: this.room.game.discardPile.cards,
-          board: this.room.game.board.getPiles(),
-          logs: this.room.game.logs,
-          players: this.room.playersInGame.map((p) => {
-            const isMe = p === player;
+        payload: this.getGameState(player),
+      }),
+      ws
+    );
+  }
+
+  private getGameState(player: Player) {
+    if (!this.room.game) throw new Error("O jogo ainda não começou.");
+
+    return {
+      isWatchMode: player.isWatching,
+      roomId: this.room.id,
+      tips: this.room.game.tips,
+      lives: this.room.game.lives,
+      deckSize: this.room.game.deck.amountOfCards,
+      score: this.room.game.board.score,
+      turnNumber: this.room.game.turnNumber,
+      roundNumber: this.room.game.roundNumber,
+      currentPlayerIndex: this.room.game.currentPlayerIndex,
+      isGameFinished: this.room.game.isGameFinished,
+      isGamePaused: this.room.game.isGamePaused,
+      expansions: this.room.game.board.expansions,
+      discardPile: this.room.game.discardPile.cards,
+      board: this.room.game.board.getPiles(),
+      logs: this.room.game.logs,
+      players: this.room.playersInGame.map((p) => {
+        const isMe = p === player;
+
+        return {
+          isMe,
+          name: p.name,
+          isLeader: p === this.room.leader,
+          hand: p.hand.map((card) => {
+            const canSeeValue = isMe ? card.isValueRevealed : true;
+            const canSeeColor = isMe ? card.isColorRevealed : true;
+
+            const value = canSeeValue ? card.value : null;
+            const color = canSeeColor ? card.color : null;
 
             return {
-              isMe,
-              name: p.name,
-              isLeader: p === this.room.leader,
-              hand: p.hand.map((card) => {
-                const canSeeValue = isMe ? card.isValueRevealed : true;
-                const canSeeColor = isMe ? card.isColorRevealed : true;
-
-                const value = canSeeValue ? card.value : null;
-                const color = canSeeColor ? card.color : null;
-
-                return {
-                  ...card,
-                  value: value as Card.VALUE,
-                  color: color as Card.COLOR,
-                };
-              }),
+              ...card,
+              value: value as Card.VALUE,
+              color: color as Card.COLOR,
             };
           }),
-        },
-      };
-    }, ws);
+        };
+      }),
+    };
   }
 }

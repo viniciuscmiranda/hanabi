@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from "react";
+import { isEqual } from "lodash";
 
 import type {
   RoomState,
@@ -8,20 +9,30 @@ import type {
   Card,
   RoomSettings,
   Reaction,
+  PlayerActionGameEvent,
 } from "../../../core/types";
 
-const TIMEOUT = 2000;
-const DELAY = 300;
+const CONNECTION_TIMEOUT = 2000;
+const CONNECTION_DELAY = 300;
 const REACTION_DURATION = 4500;
-const REACTION_INTERVAL = 1000;
+const CHECK_REACTION_INTERVAL = 1000;
+const ANIMATION_DURATION = 1050;
+const CHECK_ANIMATION_INTERVAL = 50;
+
+type EventHistory = {
+  event: PlayerActionGameEvent;
+  timestamp: number;
+};
 
 export function useGame(url?: string) {
   const ws = useRef<WebSocket>(null);
   const connectionDelay = useRef<NodeJS.Timeout>(null);
   const reactionInterval = useRef<NodeJS.Timeout>(null);
+
   const [room, setRoom] = useState<RoomState>();
   const [game, setGame] = useState<GameState>();
   const [reactions, setReactions] = useState<Reaction[]>([]);
+  const [events, setEvents] = useState<EventHistory[]>([]);
 
   const [error, setError] = useState<string>();
   const [isConnecting, setIsConnecting] = useState(false);
@@ -62,7 +73,7 @@ export function useGame(url?: string) {
             setError("Não foi possível conectar-se ao servidor");
             disconnect();
           }
-        }, TIMEOUT);
+        }, CONNECTION_TIMEOUT);
 
         ws.current.onerror = () => {
           clearTimeout(connectionTimeout);
@@ -90,6 +101,17 @@ export function useGame(url?: string) {
               break;
             case "GAME_UPDATE":
               setGame(payload);
+              break;
+            case "PLAYER_PLAY":
+            case "PLAYER_DISCARD":
+              setEvents((prev) => [
+                ...prev,
+                { event: data, timestamp: Date.now() },
+              ]);
+              break;
+            // TODO: remove this
+            case "PLAYER_GIVE_TIP":
+              setGame(payload.gameState);
               break;
             case "ERROR":
               setError(payload.error);
@@ -120,12 +142,12 @@ export function useGame(url?: string) {
 
                     return next;
                   });
-                }, REACTION_INTERVAL);
+                }, CHECK_REACTION_INTERVAL);
               }
               break;
           }
         };
-      }, DELAY);
+      }, CONNECTION_DELAY);
     },
     [disconnect]
   );
@@ -135,6 +157,29 @@ export function useGame(url?: string) {
     if (url) connect(url);
     return () => disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // initialize animation check interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEvents((prev) => {
+        const next = prev.filter((event) => {
+          const isAnimationEnded =
+            Date.now() - event.timestamp > ANIMATION_DURATION;
+
+          if (isAnimationEnded) {
+            setGame(event.event.payload.gameState);
+          }
+
+          return !isAnimationEnded;
+        });
+
+        if (isEqual(prev, next)) return prev;
+        return next;
+      });
+    }, CHECK_ANIMATION_INTERVAL);
+
+    return () => clearInterval(interval);
   }, []);
 
   const reset = useCallback(() => {
@@ -217,6 +262,7 @@ export function useGame(url?: string) {
     room,
     game,
     reactions,
+    event: events.at(0)?.event,
     error,
     isConnected,
     isConnecting,

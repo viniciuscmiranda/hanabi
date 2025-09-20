@@ -18,6 +18,14 @@ const readableByCardColor: Record<Card.COLOR, string> = {
   colorless: "⚫",
 };
 
+const readableByNumberValue: Record<Card.VALUE, string> = {
+  one: "1",
+  two: "2",
+  three: "3",
+  four: "4",
+  five: "5",
+};
+
 export const Format = {
   card(card: Card) {
     const value = readableByCardValue[card.value];
@@ -25,9 +33,15 @@ export const Format = {
 
     return `${value}${color}`;
   },
-  info(info: Card.INFO, card: Card) {
-    if (info === "value") return readableByCardValue[card.value];
-    else if (info === "color") return readableByCardColor[card.color];
+  color(color: Card.COLOR) {
+    return readableByCardColor[color];
+  },
+  value(value: Card.VALUE) {
+    return readableByCardValue[value];
+  },
+  numberValue(value?: Card.VALUE | null) {
+    if (!value) return "?";
+    return readableByNumberValue[value];
   },
   score(score: number) {
     if (score <= 5) return "Horrível, vaias da multidão...";

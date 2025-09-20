@@ -40,6 +40,7 @@ export function App() {
     isConnecting,
     error,
     reactions,
+    event,
   } = useGame(url);
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export function App() {
 
     return (
       <Game
+        event={event}
         state={game}
         onPlayCard={playCard}
         onDiscardCard={discardCard}

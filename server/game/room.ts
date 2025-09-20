@@ -149,27 +149,56 @@ export class Room {
     }
 
     switch (event) {
-      case "PLAYER_PLAY":
-        this.game!.playCard(player, payload.cardIndex);
-        this.messenger.sendGameState();
+      case "PLAYER_PLAY": {
+        const { wasAddedToTheBoard, drawnCard, playedCard } =
+          this.game!.playCard(player, payload.cardIndex);
+
+        this.messenger.sendPlayerPlay(
+          this.playersInGame.indexOf(player),
+          payload.cardIndex,
+          wasAddedToTheBoard,
+          playedCard,
+          drawnCard
+        );
+
         break;
-      case "PLAYER_DISCARD":
-        this.game!.discardCard(player, payload.cardIndex);
-        this.messenger.sendGameState();
+      }
+      case "PLAYER_DISCARD": {
+        const { discardedCard, drawnCard } = this.game!.discardCard(
+          player,
+          payload.cardIndex
+        );
+
+        this.messenger.sendPlayerDiscard(
+          this.playersInGame.indexOf(player),
+          payload.cardIndex,
+          discardedCard,
+          drawnCard
+        );
+
         break;
-      case "PLAYER_GIVE_TIP":
+      }
+      case "PLAYER_GIVE_TIP": {
         const selectedPlayer = this.playersInGame.at(payload.playerIndex);
         if (!selectedPlayer) throw new Error("Jogador não encontrado.");
 
-        this.game!.giveTip(
+        const cardIndexes = this.game!.giveTip(
           player,
           selectedPlayer,
           payload.cardIndex,
           payload.info
         );
 
-        this.messenger.sendGameState();
+        this.messenger.sendPlayerGiveTip(
+          this.playersInGame.indexOf(player),
+          payload.playerIndex,
+          payload.cardIndex,
+          cardIndexes,
+          payload.info
+        );
+
         break;
+      }
       case "PLAYER_READY":
         player.isReady = true;
         this.messenger.sendRoomState();

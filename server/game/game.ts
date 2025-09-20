@@ -89,8 +89,11 @@ export class Game {
       }).`
     );
 
-    if (this.checkGameFinished()) return;
-    this.endTurn();
+    if (!this.checkGameFinished()) {
+      this.endTurn();
+    }
+
+    return cardsToReveal.map((card) => selectedPlayer.hand.indexOf(card));
   }
 
   public playCard(player: Player, cardIndex: number) {
@@ -109,15 +112,22 @@ export class Game {
       this.addTip();
     }
 
-    if (this.checkGameFinished()) return;
-    this.drawCard(player);
-    this.endTurn();
+    let drawnCard: Card | undefined;
+    if (!this.checkGameFinished()) {
+      drawnCard = this.drawCard(player);
+      this.endTurn();
+    }
+
+    return { wasAddedToTheBoard, drawnCard, playedCard };
   }
 
   public discardCard(player: Player, cardIndex: number) {
     this.throwIfPlayerCannotPlay(player);
 
     const discardedCard = player.getCardByIndex(cardIndex);
+    discardedCard.reveal("value");
+    discardedCard.reveal("color");
+
     this.log(`🗑️ ${player.name} descartou ${Format.card(discardedCard)}.`);
 
     player.removeCard(discardedCard);
@@ -125,9 +135,14 @@ export class Game {
 
     this.addTip();
 
-    if (this.checkGameFinished()) return;
-    this.drawCard(player);
-    this.endTurn();
+    let drawnCard: Card | undefined;
+
+    if (!this.checkGameFinished()) {
+      drawnCard = this.drawCard(player);
+      this.endTurn();
+    }
+
+    return { discardedCard, drawnCard };
   }
 
   public disconnectPlayer(player: Player) {
@@ -149,12 +164,15 @@ export class Game {
   private drawCard(player: Player) {
     if (this.deck.amountOfCards <= 0) return;
 
-    player.addCard(this.deck.draw());
+    const drawnCard = this.deck.draw();
+    player.addCard(drawnCard);
     this.playerWhoDrewLastCard = player;
 
     this.log(
       `🃏 ${player.name} comprou uma carta. (Restam ${this.deck.amountOfCards}).`
     );
+
+    return drawnCard;
   }
 
   private endTurn() {
