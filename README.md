@@ -1,0 +1,49 @@
+# TO-DO
+
+- [x] validate message input with zod
+- [x] add reactions
+- [x] add public rooms list
+- [x] disconnect inactive clients
+- [ ] add animations
+  - [x] discard
+  - [x] play
+  - [x] draw
+  - [x] player change
+  - [x] hint
+  - [ ] lose life
+  - [ ] get tip
+  - [ ] out of tips warning on click
+  - [ ] turn start overlay
+- [ ] increase room buttons size on mobile
+- [ ] add hide button to game over and pause screens
+- [ ] only pause game if it's current player is not on the game
+- [ ] add fireworks animation on game over
+  - [ ] based on completed colors
+  - [ ] levels 3, 4 and 5 for each color
+  - [ ] https://alvaromontoro.com/blog/68002/creating-a-firework-effect-with-css
+- [ ] add game rules
+- [ ] add source code
+- [ ] add README
+- [x] fix redirect bug on production (keep /hanabi)
+- [x] add scroll on mobile layout room
+- [x] add env
+- [x] fix play/draw animation on mobile
+- [x] fix info width on mobile
+- [x] game over gap
+- [x] share button on mobile
+- [ ] add english support
+- [ ] improve kick feature
+  - [ ] allow kick and leader pass on play room
+    - [ ] fix bug
+  - [ ] add cooldown after kick
+- [ ] add ping pong and offline warning
+  - [ ] ensure players get disconnected
+- [ ] player reconnect key
+- [ ] fix share score link
+- [ ] deploy to AWS
+
+- [ ] add unit tests back-end
+- [ ] add unit tests front-end
+- [ ] add suggestions box
+- [ ] github actions to deploy and run unit-tests
+- [ ] refactor css

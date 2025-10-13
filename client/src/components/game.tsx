@@ -20,6 +20,7 @@ type GameProps = {
     cardIndex: number,
     info: "value" | "color"
   ) => void;
+  onKickPlayer: (playerIndex: number) => void;
 };
 
 export const Game = ({
@@ -29,6 +30,7 @@ export const Game = ({
   onPlayCard,
   onDiscardCard,
   onGiveTip,
+  onKickPlayer,
 }: GameProps) => {
   const players = useMemo(() => {
     const players = state.players.map((p, index) => ({ ...p, index }));
@@ -88,6 +90,8 @@ export const Game = ({
     }
   }
 
+  const me = players.find((player) => player.isMe);
+
   return (
     <main className="game">
       <Logs logs={state.logs} />
@@ -101,6 +105,10 @@ export const Game = ({
             return (
               <Hand
                 key={player.index}
+                isLeader={player.isLeader}
+                isConnected={player.isConnected}
+                canKick={!player.isMe && (me?.isLeader ?? false)}
+                onKick={() => onKickPlayer(player.index)}
                 isMe={state.isWatchMode ? playerIndex === 0 : player.isMe}
                 isCurrent={state.currentPlayerIndex === player.index}
                 isWatchMode={playerIndex === 0 && state.isWatchMode}

@@ -274,8 +274,10 @@ export class Room {
           kickedClient.ws
         );
 
+        const kickedConnection = kickedClient.ws;
+
         this.disconnect(kickedClient.ws);
-        kickedClient.ws.close();
+        kickedConnection.close();
         this.messenger.sendRoomState();
         break;
       case "PLAYER_REACT":

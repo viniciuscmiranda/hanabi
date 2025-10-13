@@ -6,6 +6,7 @@ export type OtherPlayer = {
   name: string;
   isMe: false;
   isLeader: boolean;
+  isConnected: boolean;
   hand: Card[];
 };
 
@@ -13,6 +14,7 @@ export type Me = {
   name: string;
   isMe: true;
   isLeader: boolean;
+  isConnected: boolean;
   hand: (Omit<Card, "value" | "color"> & {
     value: Card.VALUE | null;
     color: Card.COLOR | null;

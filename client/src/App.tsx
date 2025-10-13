@@ -97,6 +97,7 @@ export function App() {
         onDiscardCard={discardCard}
         onGiveTip={giveTip}
         onReset={reset}
+        onKickPlayer={kickPlayer}
       />
     );
   }

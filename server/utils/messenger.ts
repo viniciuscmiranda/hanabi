@@ -214,6 +214,7 @@ export class Messenger {
           isMe,
           name: p.name,
           isLeader: p === this.room.leader,
+          isConnected: p.isConnected,
           hand: p.hand.map((card) => {
             const canSeeValue = isMe ? card.isValueRevealed : true;
             const canSeeColor = isMe ? card.isColorRevealed : true;
